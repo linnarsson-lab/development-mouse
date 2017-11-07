@@ -15,7 +15,7 @@ velocyto\.analysis module
 
 .. _API:
 
-.. automodule:: development_mouse.developmentL1
+.. automodule:: development_mouse.development_L1
    :members:
    :undoc-members:
    :member-order: bysource
