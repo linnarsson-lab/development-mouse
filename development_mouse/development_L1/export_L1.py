@@ -13,21 +13,18 @@ import development_mouse as dm
 class ExportL1(luigi.Task):
 	"""
 	Luigi Task to export summary files
-
-	Parameters
-	----------
-	tissue: str
-		name of the tissue from tool specification file
-	n_markers: int, default=10
-		the number of markers per cluster in the marker heatmap 
 	
 	Other Parameters
 	----------------
 	`memory_config.memory.batch`: int
 		the number of columns/rows used by batchscan
 	"""
-	tissue = luigi.Parameter()  #: Doc name of the tissue from tool specification file
+	tissue = luigi.Parameter()
+	"""str: name of the tissue from tool specification file."""
+
 	n_markers = luigi.IntParameter(default=10)
+	"""str: default=10
+		name of the tissue from tool specification file."""
 
 	def requires(self) -> List[luigi.Task]:
 		"""
