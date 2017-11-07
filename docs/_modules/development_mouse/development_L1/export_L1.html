@@ -64,41 +64,48 @@
 <span class="sd">		name of the tissue from tool specification file</span>
 <span class="sd">	n_markers: int, default=10</span>
 <span class="sd">		the number of markers per cluster in the marker heatmap </span>
-
-<span class="sd">	Raises</span>
-<span class="sd">	------</span>
-<span class="sd">	`AggregateL1`</span>
-<span class="sd">		passing ``tissue``</span>
-<span class="sd">	`ClusterL1`</span>
-<span class="sd">		passing ``tissue``</span>
-
-<span class="sd">	Returns</span>
-<span class="sd">	-------</span>
-<span class="sd">	Reads the output of `AggregateL1` and does:</span>
-<span class="sd">		runs the `cytograph.AutoAnnotator`</span>
-<span class="sd">		exports  ``L1_[TISSUE]_expression.tab``, ``L1_[TISSUE]_enrichment.tab``, ``L1_[TISSUE]_trinaries.tab``</span>
-<span class="sd">		uses `cytograph.plot_graph` to plot ``L1_[TISSUE]_manifold.aa.png``, ``L1_[TISSUE]_manifold.aaa.png``</span>
-<span class="sd">		uses `cytograph.plot_markerheatmap` to plot ``L1_[TISSUE]_heatmap.pdf``</span>
-
-<span class="sd">	Yields</span>
-<span class="sd">	------</span>
-<span class="sd">	folder: ``L1_[TISSUE]_exported``</span>
-<span class="sd">		Note this is kind of a hack to luigi, single files will not be regenerated but whole folder will.</span>
-
+<span class="sd">	</span>
+<span class="sd">	Other Parameters</span>
+<span class="sd">	----------------</span>
+<span class="sd">	`memory_config.memory.batch`</span>
+<span class="sd">		the number of columns/rows used by batchscan</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">tissue</span> <span class="o">=</span> <span class="n">luigi</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>  <span class="c1"># name of the tissue from tool specification file</span>
 	<span class="n">n_markers</span> <span class="o">=</span> <span class="n">luigi</span><span class="o">.</span><span class="n">IntParameter</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ExportL1.requires"><a class="viewcode-back" href="../../../index.html#development_mouse.development_L1.export_L1.ExportL1.requires">[docs]</a>	<span class="k">def</span> <span class="nf">requires</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">luigi</span><span class="o">.</span><span class="n">Task</span><span class="p">]:</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Returns</span>
+<span class="sd">		-------</span>
+<span class="sd">		`AggregateL1`</span>
+<span class="sd">			passing ``tissue``</span>
+<span class="sd">		`ClusterL1`</span>
+<span class="sd">			passing ``tissue``</span>
+<span class="sd">		&quot;&quot;&quot;</span>
 		<span class="k">return</span> <span class="p">[</span>
 			<span class="n">dm</span><span class="o">.</span><span class="n">AggregateL1</span><span class="p">(</span><span class="n">tissue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tissue</span><span class="p">),</span>
 			<span class="n">dm</span><span class="o">.</span><span class="n">ClusterL1</span><span class="p">(</span><span class="n">tissue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tissue</span><span class="p">)</span></div>
 		<span class="p">]</span>
 
-<div class="viewcode-block" id="ExportL1.output"><a class="viewcode-back" href="../../../index.html#development_mouse.development_L1.export_L1.ExportL1.output">[docs]</a>	<span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">luigi</span><span class="o">.</span><span class="n">Target</span><span class="p">:</span></div>
+<div class="viewcode-block" id="ExportL1.output"><a class="viewcode-back" href="../../../index.html#development_mouse.development_L1.export_L1.ExportL1.output">[docs]</a>	<span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">luigi</span><span class="o">.</span><span class="n">Target</span><span class="p">:</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Returns</span>
+<span class="sd">		-------</span>
+<span class="sd">		folder: ``L1_[TISSUE]_exported``</span>
+<span class="sd">		Note this is kind of a hack to luigi, single files will not be regenerated but whole folder will.</span>
+<span class="sd">		&quot;&quot;&quot;</span></div>
 		<span class="k">return</span> <span class="n">luigi</span><span class="o">.</span><span class="n">LocalTarget</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cg</span><span class="o">.</span><span class="n">paths</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">,</span> <span class="s2">&quot;L1_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tissue</span> <span class="o">+</span> <span class="s2">&quot;_exported&quot;</span><span class="p">))</span>
 
 <div class="viewcode-block" id="ExportL1.run"><a class="viewcode-back" href="../../../index.html#development_mouse.development_L1.export_L1.ExportL1.run">[docs]</a>	<span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Returns</span>
+<span class="sd">		-------</span>
+<span class="sd">		Reads the output of `AggregateL1` and does:</span>
+<span class="sd">		runs the `cytograph.AutoAnnotator`</span>
+<span class="sd">		exports  ``L1_[TISSUE]_expression.tab``, ``L1_[TISSUE]_enrichment.tab``, ``L1_[TISSUE]_trinaries.tab``</span>
+<span class="sd">		uses `cytograph.plot_graph` to plot ``L1_[TISSUE]_manifold.aa.png``, ``L1_[TISSUE]_manifold.aaa.png``</span>
+<span class="sd">		uses `cytograph.plot_markerheatmap` to plot ``L1_[TISSUE]_heatmap.pdf``</span>
+<span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">logging</span> <span class="o">=</span> <span class="n">cg</span><span class="o">.</span><span class="n">logging</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 		<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Exporting cluster data&quot;</span><span class="p">)</span>
 		<span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">()</span><span class="o">.</span><span class="n">temporary_path</span><span class="p">()</span> <span class="k">as</span> <span class="n">out_dir</span><span class="p">:</span>
