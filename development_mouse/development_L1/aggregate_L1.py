@@ -10,18 +10,45 @@ import luigi
 import scipy.cluster.hierarchy as hierarchy
 import numpy_groupies.aggregate_numpy as npg
 import scipy.cluster.hierarchy as hc
+import development_mouse as dm
 
 
 class AggregateL1(luigi.Task):
 	"""
 	Aggregate all clusters in a new Loom file
+
+	Parameters
+	----------
+	tissue: str
+		name of the tissue from tool specification file
+	n_markers: int, default=10
+		the number of markers per cluster in the marker heatmap 
+	n_auto_genes: int, default=6
+		number of genes to include in the auto-auto-annotation
+
+	Raises
+	------
+	`ClusterL1`
+		with the parameter tissue
+
+	Returns
+	-------
+	On the output of `ClusterL1`:
+	- Runs the `cytograph.Aggregator` and outputs thte results to itself (Note this breaks the luigi philosophy)
+	- Runs the `cytograph.AutoAnnotator` and outputs the results to the ``L1_[TISSUE].agg.loom`` file
+	- Runs the  `cytograph.AutoAutoAnnotator` and outputs the results to the ``L1_[TISSUE].agg.loom`` file
+
+	Yields
+	------
+	file: ``L1_[TISSUE].agg.loom``
+
 	"""
 	tissue = luigi.Parameter()
 	n_markers = luigi.IntParameter(default=10)
 	n_auto_genes = luigi.IntParameter(default=6)
 
 	def requires(self) -> List[luigi.Task]:
-		return cg.ClusterL1(tissue=self.tissue)
+		return dm.ClusterL1(tissue=self.tissue)
 
 	def output(self) -> luigi.Target:
 		return luigi.LocalTarget(os.path.join(cg.paths().build, "L1_" + self.tissue + ".agg.loom"))

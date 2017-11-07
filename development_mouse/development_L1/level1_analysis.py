@@ -5,6 +5,7 @@ import pickle
 import loompy
 import numpy as np
 import cytograph as cg
+import development_mouse as dm
 import luigi
 
 
@@ -12,8 +13,8 @@ class Level1Analysis(luigi.WrapperTask):
 	"""
 	Luigi Wrapper Task to trigger all Level 1 analyses through ExportL1
 
-	Arguments
-	---------
+	Parameters
+	----------
 	project: str, default=Development
 		Specify set of ``tissues`` that will analyzed. Info is gathered using the ``pool_specification.tab`` file
 	
@@ -27,4 +28,4 @@ class Level1Analysis(luigi.WrapperTask):
 	def requires(self) -> Iterator[luigi.Task]:
 		tissues = cg.PoolSpec().tissues_for_project(self.project)
 		for tissue in tissues:
-			yield cg.ExportL1(tissue=tissue)
+			yield dm.ExportL1(tissue=tissue)

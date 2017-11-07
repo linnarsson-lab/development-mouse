@@ -7,14 +7,15 @@ import numpy as np
 import networkx as nx
 import cytograph as cg
 import luigi
+import development_mouse as dm
 
 
 class ExportL1(luigi.Task):
 	"""
 	Luigi Task to export summary files
 
-	Arguments
-	---------
+	Parameters
+	----------
 	tissue: str
 		name of the tissue from tool specification file
 	n_markers: int, default=10
@@ -29,11 +30,16 @@ class ExportL1(luigi.Task):
 
 	Returns
 	-------
-	Reads the output of `AggregateL1` and dies:
+	Reads the output of `AggregateL1` and does:
 	- runs the `cytograph.AutoAnnotator`
 	- exports  ``L1_[TISSUE]_expression.tab``, ``L1_[TISSUE]_enrichment.tab``, ``L1_[TISSUE]_trinaries.tab``
 	- uses `cytograph.plot_graph` to plot ``L1_[TISSUE]_manifold.aa.png``, ``L1_[TISSUE]_manifold.aaa.png``
 	- uses `cytograph.plot_markerheatmap` to plot ``L1_[TISSUE]_heatmap.pdf``
+
+	Yields
+	------
+	folder: ``L1_[TISSUE]_exported``
+		Note this is kind of a hack to luigi, single files will not be regenerated but whole folder will.
 
 	"""
 	tissue = luigi.Parameter()
@@ -41,8 +47,8 @@ class ExportL1(luigi.Task):
 
 	def requires(self) -> List[luigi.Task]:
 		return [
-			cg.AggregateL1(tissue=self.tissue),
-			cg.ClusterL1(tissue=self.tissue)
+			dm.AggregateL1(tissue=self.tissue),
+			dm.ClusterL1(tissue=self.tissue)
 		]
 
 	def output(self) -> luigi.Target:
