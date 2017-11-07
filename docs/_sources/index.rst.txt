@@ -10,7 +10,7 @@ Welcome to development-mouse's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-velocyto\.analysis module
+development_mouse\.development_L1 module
 =========================
 
 .. _API:
