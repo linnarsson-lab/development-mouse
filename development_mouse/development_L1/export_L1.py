@@ -20,41 +20,48 @@ class ExportL1(luigi.Task):
 		name of the tissue from tool specification file
 	n_markers: int, default=10
 		the number of markers per cluster in the marker heatmap 
-
-	Raises
-	------
-	`AggregateL1`
-		passing ``tissue``
-	`ClusterL1`
-		passing ``tissue``
-
-	Returns
-	-------
-	Reads the output of `AggregateL1` and does:
-		runs the `cytograph.AutoAnnotator`
-		exports  ``L1_[TISSUE]_expression.tab``, ``L1_[TISSUE]_enrichment.tab``, ``L1_[TISSUE]_trinaries.tab``
-		uses `cytograph.plot_graph` to plot ``L1_[TISSUE]_manifold.aa.png``, ``L1_[TISSUE]_manifold.aaa.png``
-		uses `cytograph.plot_markerheatmap` to plot ``L1_[TISSUE]_heatmap.pdf``
-
-	Yields
-	------
-	folder: ``L1_[TISSUE]_exported``
-		Note this is kind of a hack to luigi, single files will not be regenerated but whole folder will.
-
+	
+	Other Parameters
+	----------------
+	`memory_config.memory.batch`
+		the number of columns/rows used by batchscan
 	"""
 	tissue = luigi.Parameter()  # name of the tissue from tool specification file
 	n_markers = luigi.IntParameter(default=10)
 
 	def requires(self) -> List[luigi.Task]:
+		"""
+		Returns
+		-------
+		`AggregateL1`
+			passing ``tissue``
+		`ClusterL1`
+			passing ``tissue``
+		"""
 		return [
 			dm.AggregateL1(tissue=self.tissue),
 			dm.ClusterL1(tissue=self.tissue)
 		]
 
 	def output(self) -> luigi.Target:
+		"""
+		Returns
+		-------
+		folder: ``L1_[TISSUE]_exported``
+		Note this is kind of a hack to luigi, single files will not be regenerated but whole folder will.
+		"""
 		return luigi.LocalTarget(os.path.join(cg.paths().build, "L1_" + self.tissue + "_exported"))
 
 	def run(self) -> None:
+		"""
+		Returns
+		-------
+		Reads the output of `AggregateL1` and does:
+		runs the `cytograph.AutoAnnotator`
+		exports  ``L1_[TISSUE]_expression.tab``, ``L1_[TISSUE]_enrichment.tab``, ``L1_[TISSUE]_trinaries.tab``
+		uses `cytograph.plot_graph` to plot ``L1_[TISSUE]_manifold.aa.png``, ``L1_[TISSUE]_manifold.aaa.png``
+		uses `cytograph.plot_markerheatmap` to plot ``L1_[TISSUE]_heatmap.pdf``
+		"""
 		logging = cg.logging(self, True)
 		logging.info("Exporting cluster data")
 		with self.output().temporary_path() as out_dir:
