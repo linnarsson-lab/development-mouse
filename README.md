@@ -79,3 +79,17 @@ Argument|Effect
 `--module development_mouse TASKNAME`| run the `TASKNAME` task in the Python module `development_mouse`.
 `--paths-samples /data/proj/chromium/loom_samples/` | a configuration of the `paths` object, setting the sample path
 `--paths-build /data/proj/development/build_20171107` | a configuration of the `paths` object, setting the build path
+
+##################
+Tasks Descriptions
+##################
+
+# Level1 tasks
+
+[TODO] Add image of the tasks hierarchy
+
+## Level1Analysis
+
+It is the main task to run. It triggers ExportL1 that in turn will trigger all level 1 set.
+
+
