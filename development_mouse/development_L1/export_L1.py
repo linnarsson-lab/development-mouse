@@ -23,18 +23,18 @@ class ExportL1(luigi.Task):
 
 	Raises
 	------
-	:obj:`AggregateL1`
+	`AggregateL1`
 		passing ``tissue``
-	:obj:`ClusterL1`
+	`ClusterL1`
 		passing ``tissue``
 
 	Returns
 	-------
 	Reads the output of `AggregateL1` and does:
-	- runs the `cytograph.AutoAnnotator`
-	- exports  ``L1_[TISSUE]_expression.tab``, ``L1_[TISSUE]_enrichment.tab``, ``L1_[TISSUE]_trinaries.tab``
-	- uses `cytograph.plot_graph` to plot ``L1_[TISSUE]_manifold.aa.png``, ``L1_[TISSUE]_manifold.aaa.png``
-	- uses `cytograph.plot_markerheatmap` to plot ``L1_[TISSUE]_heatmap.pdf``
+		runs the `cytograph.AutoAnnotator`
+		exports  ``L1_[TISSUE]_expression.tab``, ``L1_[TISSUE]_enrichment.tab``, ``L1_[TISSUE]_trinaries.tab``
+		uses `cytograph.plot_graph` to plot ``L1_[TISSUE]_manifold.aa.png``, ``L1_[TISSUE]_manifold.aaa.png``
+		uses `cytograph.plot_markerheatmap` to plot ``L1_[TISSUE]_heatmap.pdf``
 
 	Yields
 	------
@@ -42,7 +42,7 @@ class ExportL1(luigi.Task):
 		Note this is kind of a hack to luigi, single files will not be regenerated but whole folder will.
 
 	"""
-	tissue = luigi.Parameter()
+	tissue = luigi.Parameter()  # name of the tissue from tool specification file
 	n_markers = luigi.IntParameter(default=10)
 
 	def requires(self) -> List[luigi.Task]:

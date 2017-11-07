@@ -13,37 +13,13 @@ Welcome to development-mouse's documentation!
 
 .. _API:
 
-development_mouse\.development_L1\.export_L1 module
-==================================================
-
-.. automodule:: development_mouse.development_L1.export_L1
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-development_mouse\.development_L1\.level1_analysis module
-=========================================================
-
-.. automodule:: development_mouse.development_L1.level1_analysis
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-development_mouse\.development_L1\.development_L1 module
-========================================================
-
-.. automodule:: development_mouse.development_L1
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-development_mouse\.development_L1\.export_L1\.ExportL1 module
-=========================================================
+ExportL1 object
+===============
 
 .. autoclass:: development_mouse.development_L1.export_L1.ExportL1
    :members:
    :undoc-members:
-   :show-inheritance:
+   :member-order: bysource
 
 
 Indices and tables
