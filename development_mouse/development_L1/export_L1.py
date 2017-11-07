@@ -30,9 +30,9 @@ class ExportL1(luigi.Task):
 		"""
 		Returns
 		-------
-		`AggregateL1`
+		`AggregateL1`:
 			passing ``tissue``
-		`ClusterL1`
+		`ClusterL1`:
 			passing ``tissue``
 		"""
 		return [
@@ -44,8 +44,8 @@ class ExportL1(luigi.Task):
 		"""
 		Returns
 		-------
-		folder: ``L1_[TISSUE]_exported``
-		Note this is kind of a hack to luigi, single files will not be regenerated but whole folder will.
+		folder: ``L1_[TISSUE]_exported``:
+			Note this is kind of a hack to luigi, single files will not be regenerated but whole folder will.
 		"""
 		return luigi.LocalTarget(os.path.join(cg.paths().build, "L1_" + self.tissue + "_exported"))
 
