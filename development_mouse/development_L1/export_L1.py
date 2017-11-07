@@ -23,10 +23,10 @@ class ExportL1(luigi.Task):
 	
 	Other Parameters
 	----------------
-	`memory_config.memory.batch`
+	`memory_config.memory.batch`: int
 		the number of columns/rows used by batchscan
 	"""
-	tissue = luigi.Parameter()  # name of the tissue from tool specification file
+	tissue = luigi.Parameter()  #: Doc name of the tissue from tool specification file
 	n_markers = luigi.IntParameter(default=10)
 
 	def requires(self) -> List[luigi.Task]:
