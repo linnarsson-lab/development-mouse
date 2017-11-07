@@ -10,14 +10,21 @@ import luigi
 
 class Level1Analysis(luigi.WrapperTask):
 	"""
-	Luigi Task to run all Level 1 analyses
+	Luigi Wrapper Task to trigger all Level 1 analyses through ExportL1
+
+	Arguments
+	---------
+	project: str, default=Development
+		Specify set of ``tissues`` that will analyzed. Info is gathered using the ``pool_specification.tab`` file
+	
+	Returns
+	-------
+	Yields ``ExportL1(tissue) for tissue in project``
 	"""
 
-	project = luigi.Parameter(default="Adolescent")
+	project = luigi.Parameter(default="Development")  # NOTE: This could be hardcoded since the pipeline split, but I leave it as an option for more flexibility. 
 
 	def requires(self) -> Iterator[luigi.Task]:
 		tissues = cg.PoolSpec().tissues_for_project(self.project)
 		for tissue in tissues:
 			yield cg.ExportL1(tissue=tissue)
-			# if self.project == "Development":
-			# 	yield cg.PlotGraphAgeL1(tissue=tissue)
