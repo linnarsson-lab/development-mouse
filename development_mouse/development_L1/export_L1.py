@@ -12,6 +12,29 @@ import luigi
 class ExportL1(luigi.Task):
 	"""
 	Luigi Task to export summary files
+
+	Arguments
+	---------
+	tissue: str
+		name of the tissue from tool specification file
+	n_markers: int, default=10
+		the number of markers per cluster in the marker heatmap 
+
+	Raises
+	------
+	:obj:`AggregateL1`
+		passing ``tissue``
+	:obj:`ClusterL1`
+		passing ``tissue``
+
+	Returns
+	-------
+	Reads the output of `AggregateL1` and dies:
+	- runs the `cytograph.AutoAnnotator`
+	- exports  ``L1_[TISSUE]_expression.tab``, ``L1_[TISSUE]_enrichment.tab``, ``L1_[TISSUE]_trinaries.tab``
+	- uses `cytograph.plot_graph` to plot ``L1_[TISSUE]_manifold.aa.png``, ``L1_[TISSUE]_manifold.aaa.png``
+	- uses `cytograph.plot_markerheatmap` to plot ``L1_[TISSUE]_heatmap.pdf``
+
 	"""
 	tissue = luigi.Parameter()
 	n_markers = luigi.IntParameter(default=10)

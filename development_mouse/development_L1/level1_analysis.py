@@ -17,8 +17,8 @@ class Level1Analysis(luigi.WrapperTask):
 	project: str, default=Development
 		Specify set of ``tissues`` that will analyzed. Info is gathered using the ``pool_specification.tab`` file
 	
-	Returns
-	-------
+	Raises
+	------
 	Yields ``ExportL1(tissue) for tissue in project``
 	"""
 
