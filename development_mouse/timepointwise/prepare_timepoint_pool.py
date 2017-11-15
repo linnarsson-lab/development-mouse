@@ -20,9 +20,9 @@ class PrepareTimepointPool(luigi.Task):
 
     def requires(self) -> List[luigi.Task]:
         if self.tissue:
-            samples = dm.PoolSpec().samples_for_tissue_and_timepool(self.tissue, self.timepool)
+            samples = cg.PoolSpec().samples_for_tissue_and_timepool(self.tissue, self.timepool)
         else:
-            samples = dm.PoolSpec().samples_for_timepool(self.timepool)
+            samples = cg.PoolSpec().samples_for_timepool(self.timepool)
         return [dm.Sample(sample=s) for s in samples]
 
     def output(self) -> luigi.Target:

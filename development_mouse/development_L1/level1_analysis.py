@@ -27,6 +27,6 @@ class Level1Analysis(luigi.WrapperTask):
 	project = luigi.Parameter(default="Development")  # NOTE: This could be hardcoded since the pipeline split, but I leave it as an option for more flexibility. 
 
 	def requires(self) -> Iterator[luigi.Task]:
-		tissues = dm.PoolSpec().tissues_for_project(self.project)
+		tissues = cg.PoolSpec().tissues_for_project(self.project)
 		for tissue in tissues:
 			yield dm.ExportL1(tissue=tissue)
