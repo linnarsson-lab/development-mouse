@@ -14,7 +14,7 @@ git clone https://github.com/linnarsson-lab/development-mouse.git
 3. Install in development mode using `pip`:
 
 ```
-cd adolescent-mouse
+cd development-mouse
 pip install -e .
 ```
 
