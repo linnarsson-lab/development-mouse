@@ -29,7 +29,7 @@ class ClusterLayoutProcess(luigi.Task):
 	processname = luigi.Parameter()
 
 	def requires(self) -> luigi.Task:
-		return cg.StudyProcessPool(processname=self.processname)
+		return dm.StudyProcessPool(processname=self.processname)
 
 	def output(self) -> luigi.Target:
 		return luigi.LocalTarget(os.path.join(dm.paths().build, "%s.LJ.loom" % self.processname))

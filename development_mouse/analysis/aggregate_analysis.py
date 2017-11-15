@@ -22,7 +22,7 @@ class AggregateAnalysis(luigi.Task):  # Status: Ok
 	n_auto_genes = luigi.IntParameter(default=6)
 
 	def requires(self) -> List[luigi.Task]:
-		return cg.ClusterAnalysis(analysis=self.analysis)
+		return dm.ClusterAnalysis(analysis=self.analysis)
 
 	def output(self) -> luigi.Target:
 		return luigi.LocalTarget(os.path.join(dm.paths().build, "Analysis_" + self.analysis + ".agg.loom"))

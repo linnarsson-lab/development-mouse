@@ -23,7 +23,7 @@ class PrepareTimepointPool(luigi.Task):
             samples = cg.PoolSpec().samples_for_tissue_and_timepool(self.tissue, self.timepool)
         else:
             samples = cg.PoolSpec().samples_for_timepool(self.timepool)
-        return [cg.Sample(sample=s) for s in samples]
+        return [dm.Sample(sample=s) for s in samples]
 
     def output(self) -> luigi.Target:
         return luigi.LocalTarget(os.path.join(dm.paths().build, f"T0_{self.timepool}{'_' + self.tissue if self.tissue else ''}.loom"))

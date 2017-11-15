@@ -31,7 +31,7 @@ class SplitAndPoolAa(luigi.Task):
 	time = luigi.Parameter(default="E7-E18")  # later more specific autoannotation can be devised
 
 	def requires(self) -> luigi.Task:
-		return [[cg.ClusterLayoutL1(tissue=tissue), cg.AutoAnnotateL1(tissue=tissue)] for tissue in cg.targets_map[self.target] if cg.time_check(tissue, self.time)]
+		return [[dm.ClusterLayoutL1(tissue=tissue), dm.AutoAnnotateL1(tissue=tissue)] for tissue in dm.targets_map[self.target] if dm.time_check(tissue, self.time)]
 
 	def output(self) -> luigi.Target:
 		if self.time == "E7-E18":  # This is for backwards comaptibility we might remove this condition later
@@ -65,7 +65,7 @@ class SplitAndPoolAa(luigi.Task):
 				for i, t in enumerate(tags):
 					if np.any(np.in1d(t, lineage_abbr)):
 						selected_tags.append(i)
-				for (ix, selection, vals) in ds.batch_scan(axis=1, batch_size=cg.memory().axis1):
+				for (ix, selection, vals) in ds.batch_scan(axis=1, batch_size=dm.memory().axis1):
 					# Filter the cells that belong to the selected tags
 					subset = np.intersect1d(np.where(np.in1d(labels, selected_tags))[0], selection)
 					if subset.shape[0] == 0:

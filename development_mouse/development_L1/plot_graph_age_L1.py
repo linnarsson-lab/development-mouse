@@ -17,7 +17,7 @@ class PlotGraphAgeL1(luigi.Task):
 	tissue = luigi.Parameter()
 
 	def requires(self) -> List[luigi.Task]:
-		return [cg.PrepareTissuePool(tissue=self.tissue), cg.AutoAnnotateL1(tissue=self.tissue)]
+		return [dm.PrepareTissuePool(tissue=self.tissue), dm.AutoAnnotateL1(tissue=self.tissue)]
 
 	def output(self) -> luigi.Target:
 		return luigi.LocalTarget(os.path.join(dm.paths().build, "L1_" + self.tissue + ".age.png"))
@@ -32,4 +32,4 @@ class PlotGraphAgeL1(luigi.Task):
 				tags.append(line.split('\t')[1].replace(",", "\n")[:-1])
 		with self.output().temporary_path() as out_file:
 			ds = loompy.connect(self.input()[0].fn)
-			cg.plot_graph_age(ds, out_file, tags)
+			dm.plot_graph_age(ds, out_file, tags)

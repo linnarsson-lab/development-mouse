@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 import luigi
 
 
-
 class EstimateVelocity(luigi.Task):
     """Luigi Task to run velocyto
     """
@@ -56,7 +55,7 @@ class EstimateVelocity(luigi.Task):
             logging.info("Plotting report on spliced, ambiguous, unpliced fraction")
             vlm.plot_fractions(save2file=os.path.join(out_dir, "L1_" + self.tissue + "_sau_fractions.pdf"))
 
-            # NOTE: code below is basically identical to `default_filter_and_norm` but with the exception of adjust_totS_totU 
+            # NOTE: code below is basically identical to `default_filter_and_norm` but with the exception of adjust_totS_totU
             
             # Heuristics, we should set better heuristic and could add a config file with parameters for analysis
             max_expr_avg = 40

@@ -20,7 +20,7 @@ class PrepareTissuePool(luigi.Task):
 
 	def requires(self) -> List[luigi.Task]:
 		samples = cg.PoolSpec().samples_for_tissue(self.tissue)
-		return [cg.Sample(sample=s) for s in samples]
+		return [dm.Sample(sample=s) for s in samples]
 
 	def output(self) -> luigi.Target:
 		return luigi.LocalTarget(os.path.join(dm.paths().build, "L0_" + self.tissue + ".loom"))
@@ -92,11 +92,11 @@ class PrepareTissuePool(luigi.Task):
 			n_total = ds.shape[1]
 			logging.info("%d of %d cells were valid", n_valid, n_total)
 			
-			classifier_path = os.path.join(dm.paths().samples, "classified", "classifier.pickle")
-			if os.path.exists(classifier_path) and not cg.skip().classifier:
+			classifier_path: str = os.path.join(dm.paths().samples, "classified", "classifier.pickle")
+			if os.path.exists(classifier_path) and not dm.skip().classifier:
 				logging.info("Classifying cells by major class")
 				with open(classifier_path, "rb") as f:
-					clf = pickle.load(f)  # type: cg.Classifier
+					clf = pickle.load(f)  # type: dm.Classifier
 				(classes, probs, class_labels) = clf.predict(ds, probability=True)
 
 				mapping = {
@@ -157,7 +157,7 @@ class PrepareTissuePool(luigi.Task):
 				for ix, cls in enumerate(class_labels):
 					ds.set_attr("ClassProbability_" + str(cls), probs[:, ix], axis=1)
 			else:
-				if cg.skip().classifier:
+				if dm.skip().classifier:
 					logging.info("Classification was explicitelly skipped!")
 				else:
 					logging.info("No classifier found in this build directory - skipping.")
