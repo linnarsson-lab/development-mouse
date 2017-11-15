@@ -3,7 +3,7 @@ import luigi
 
 
 class memory(luigi.Config):
-    batch = luigi.IntParameter(default=1000)
+    batch = luigi.IntParameter(default=5000)
     batchrows = luigi.IntParameter(default=0)
     batchcolumns = luigi.IntParameter(default=0)
 
