@@ -85,7 +85,7 @@ class ClusterL1(luigi.Task):
 			ds = loompy.connect(self.input().fn)
 			dsout: loompy.LoomConnection = None
 			logging.info("Removing invalid cells")
-			for (ix, selection, vals) in ds.batch_scan_layers(cells=np.where(ds.col_attrs["_Valid"] == 1)[0], layers=ds.layer.keys(), batch_size=cg.memory().axis1, axis=1):
+			for (ix, selection, vals) in ds.batch_scan_layers(cells=np.where(ds.col_attrs["_Valid"] == 1)[0], layers=ds.layer.keys(), batch_size=dm.memory().axis1, axis=1):
 				ca = {key: val[selection] for key, val in ds.col_attrs.items()}
 				if dsout is None:
 					# NOTE Loompy Create should support multilayer !!!!
