@@ -19,7 +19,7 @@ class PrepareTissuePool(luigi.Task):
 	tissue = luigi.Parameter()
 
 	def requires(self) -> List[luigi.Task]:
-		samples = cg.PoolSpec().samples_for_tissue(self.tissue)
+		samples = dm.PoolSpec().samples_for_tissue(self.tissue)
 		return [dm.Sample(sample=s) for s in samples]
 
 	def output(self) -> luigi.Target:
