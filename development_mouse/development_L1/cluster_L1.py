@@ -27,67 +27,58 @@ import development_mouse as dm
 
 class ClusterL1(luigi.Task):
 	"""Level 1 Clustering
-
-	Parameters
-	----------
-	tissue: str
-		Name of the tissue from tool specification file
-	n_markers: int, default=10
-		The number of markers per cluster in the marker heatmap
-	manifold_learning: int, default=1
-		Whether to use `cytograph.ManifoldLearning` or `cytograph.ManifoldLearning2`
-	gtsne: bool, default=True
-		Use graph t-SNE for layout
-	alpha: float, default=1
-		The scale parameter for multiscale KNN
-	filter_cellcycle: filepath, default=None
-		The path of a file containing as rows the gene symbol of genes to excluded (Note: despite the name it can be used for any gene set)
-	layer: str, default=None
-		This specifies wich layers is used for manifold learning (i.e. the matrix used to compute PCA).
-		Currently it only has effects when using `cytograph.ManifoldLearning` and not `cytograph.ManifoldLearning2`
-
-
-	Other Parameters
-	----------------
-	cluster_method: `cluster_config.cluster.method`, default="dbscan"
-		Select the method for clustering. Valid: "hdbscan", "dbscan", "multilev", "wmultilev", "mknn_louvain", "louvain" (same as None)
-	cluster_no_outliers: `cluster_config.cluster.no_outliers`, default=False
-		Whether to consider in the clustering cells that have been marked as outliers in `PrepareTissuePool`
-	memory_batch: `memory_config.memory.batch`, default=2000
-		The size of the batches that are used by `cytograph.batch_scan_layers`
-
-	Raises
-	------
-	:obj:`PrepareTissuePool`
-		passing ``tissue``
-
-	Returns
-	-------
-	Reads the output of `PrepareTissuePool` and does:
-	- runs the `cytograph.batch_scan_layers` to remove cells that are not valid (almost creating a copy)
-	- runs `cytograph.ManifoldLearning` or `cytograph.ManifoldLearning2`
-	- runs `cytograph.Clustering` on the learned mainfild
-	- if `cytograph.ManifoldLearning2` also runs `cytograph.Merger`
-
-	Yields
-	------
-	file: ``L1_[TISSUE].loom``
 	"""
+
 	tissue = luigi.Parameter()
+	"""str: Name of the tissue from tool specification file"""
 	n_genes = luigi.IntParameter(default=1000)
+	"""int, default=1000
+		The number of genes used in manifold learning"""
 	manifold_learning = luigi.IntParameter(default=1)
+	"""int, default=1
+		Whether to use `cytograph.ManifoldLearning` or `cytograph.ManifoldLearning2`"""
 	gtsne = luigi.BoolParameter(default=True)
+	"""bool, default=True
+		Use graph t-SNE for layout"""
 	alpha = luigi.FloatParameter(default=1)
+	"""float, default=1
+		The scale parameter for multiscale KNN"""
 	filter_cellcycle = luigi.Parameter(default=None)
+	"""filepath, default=None
+		The path of a file containing as rows the gene symbol of genes to excluded (Note: despite the name it can be used for any gene set)"""
 	layer = luigi.Parameter(default=None)
+	"""str, default=None
+		This specifies wich layers is used for manifold learning (i.e. the matrix used to compute PCA).
+		Currently it only has effects when using `cytograph.ManifoldLearning` and not `cytograph.ManifoldLearning2`"""
 
 	def requires(self) -> luigi.Task:
 		return dm.PrepareTissuePool(tissue=self.tissue)
 
 	def output(self) -> luigi.Target:
+		"""
+		Returns
+		-------
+		file: ``L1_[TISSUE].loom``
+
+		Reads the output of `PrepareTissuePool` and does:
+			- runs the `cytograph.batch_scan_layers` to remove cells that are not valid (almost creating a copy)
+			- runs `cytograph.ManifoldLearning` or `cytograph.ManifoldLearning2`
+			- runs `cytograph.Clustering` on the learned mainfild
+			- if `cytograph.ManifoldLearning2` also runs `cytograph.Merger`
+		"""
 		return luigi.LocalTarget(os.path.join(cg.paths().build, "L1_" + self.tissue + ".loom"))
 
 	def run(self) -> None:
+		"""
+		Other Parameters
+		----------------
+		cluster_method: `cluster_config.cluster.method`, default="dbscan"
+			Select the method for clustering. Valid: "hdbscan", "dbscan", "multilev", "wmultilev", "mknn_louvain", "louvain" (same as None)
+		cluster_no_outliers: `cluster_config.cluster.no_outliers`, default=False
+			Whether to consider in the clustering cells that have been marked as outliers in `PrepareTissuePool`
+		memory_batch: `memory_config.memory.batch`, default=2000
+			The size of the batches that are used by `cytograph.batch_scan_layers`
+		"""
 		logging = cg.logging(self)
 		with self.output().temporary_path() as out_file:
 			ds = loompy.connect(self.input().fn)
