@@ -6,6 +6,7 @@ from scipy import sparse
 import numpy as np
 import networkx as nx
 import cytograph as cg
+import development_mouse as dm
 import luigi
 
 
@@ -19,7 +20,7 @@ class PlotGraphProcess(luigi.Task):
 		return [cg.ClusterLayoutProcess(processname=self.processname), cg.AutoAnnotateProcess(processname=self.processname)]
 
 	def output(self) -> luigi.Target:
-		return luigi.LocalTarget(os.path.join(cg.paths().build, "%s.mknn.png" % self.processname))
+		return luigi.LocalTarget(os.path.join(dm.paths().build, "%s.mknn.png" % self.processname))
 
 	def run(self) -> None:
 		logging.info("Plotting MKNN graph")

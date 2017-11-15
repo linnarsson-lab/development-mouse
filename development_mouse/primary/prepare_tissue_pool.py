@@ -7,6 +7,7 @@ import pickle
 import logging
 import luigi
 import cytograph as cg
+import development_mouse as dm
 import loompy
 import numpy.core.defchararray as npstr
 
@@ -22,13 +23,13 @@ class PrepareTissuePool(luigi.Task):
 		return [cg.Sample(sample=s) for s in samples]
 
 	def output(self) -> luigi.Target:
-		return luigi.LocalTarget(os.path.join(cg.paths().build, "L0_" + self.tissue + ".loom"))
+		return luigi.LocalTarget(os.path.join(dm.paths().build, "L0_" + self.tissue + ".loom"))
 
 	def run(self) -> None:
 		# Load metadata
 		metadata: np.ndarray = None
 		meta_attrs: np.ndarray = None
-		metadata_file = os.path.join(cg.paths().samples, "metadata", "metadata.xlsx")
+		metadata_file = os.path.join(dm.paths().samples, "metadata", "metadata.xlsx")
 		if os.path.exists(metadata_file):
 			temp = pd.read_excel(metadata_file)
 			meta_attrs = temp.columns.values
@@ -72,7 +73,7 @@ class PrepareTissuePool(luigi.Task):
 			# Validating genes
 			logging.info("Marking invalid genes")
 			ds = loompy.connect(out_file)
-			vgpath = os.path.join(cg.paths().build, "genes.txt")
+			vgpath = os.path.join(dm.paths().build, "genes.txt")
 			if os.path.exists(vgpath):
 				valids = np.zeros(ds.shape[0])
 				with open(vgpath, "r") as f:
@@ -91,7 +92,7 @@ class PrepareTissuePool(luigi.Task):
 			n_total = ds.shape[1]
 			logging.info("%d of %d cells were valid", n_valid, n_total)
 			
-			classifier_path = os.path.join(cg.paths().samples, "classified", "classifier.pickle")
+			classifier_path = os.path.join(dm.paths().samples, "classified", "classifier.pickle")
 			if os.path.exists(classifier_path) and not cg.skip().classifier:
 				logging.info("Classifying cells by major class")
 				with open(classifier_path, "rb") as f:

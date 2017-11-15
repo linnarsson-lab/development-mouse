@@ -6,6 +6,7 @@ import numpy as np
 import luigi
 import gc
 import cytograph as cg
+import development_mouse as dm
 import loompy
 import logging
 from scipy import sparse
@@ -22,7 +23,7 @@ from scipy.stats import ks_2samp
 import networkx as nx
 import hdbscan
 from sklearn.cluster import DBSCAN
-import development_mouse as dm
+
 
 
 class ClusterL1(luigi.Task):
@@ -66,7 +67,7 @@ class ClusterL1(luigi.Task):
 			- runs `cytograph.Clustering` on the learned mainfild
 			- if `cytograph.ManifoldLearning2` also runs `cytograph.Merger`
 		"""
-		return luigi.LocalTarget(os.path.join(cg.paths().build, "L1_" + self.tissue + ".loom"))
+		return luigi.LocalTarget(os.path.join(dm.paths().build, "L1_" + self.tissue + ".loom"))
 
 	def run(self) -> None:
 		"""

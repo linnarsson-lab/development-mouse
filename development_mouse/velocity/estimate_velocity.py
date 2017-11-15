@@ -4,10 +4,11 @@ import loompy
 from scipy import sparse
 import numpy as np
 import cytograph as cg
+import development_mouse as dm
 import velocyto as vcy
 import matplotlib.pyplot as plt
 import luigi
-import development_mouse as dm
+
 
 
 class EstimateVelocity(luigi.Task):
@@ -38,7 +39,7 @@ class EstimateVelocity(luigi.Task):
         folder: ``L1_[TISSUE]_velocity``:
             Note this is kind of a hack to luigi, single files will not be regenerated but whole folder will.
         """
-        return luigi.LocalTarget(os.path.join(cg.paths().build, "L1_" + self.tissue + "_velocity"))
+        return luigi.LocalTarget(os.path.join(dm.paths().build, "L1_" + self.tissue + "_velocity"))
 
     def run(self) -> None:
         """

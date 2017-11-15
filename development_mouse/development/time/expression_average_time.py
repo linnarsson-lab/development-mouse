@@ -6,6 +6,7 @@ import loompy
 from scipy.special import beta, betainc, betaln
 import numpy as np
 import cytograph as cg
+import development_mouse as dm
 import luigi
 
 
@@ -21,7 +22,7 @@ class ExpressionAverageTime(luigi.Task):
 		return cg.ClusterLayoutDev(lineage=self.lineage, target=self.target, time=self.time)
 
 	def output(self) -> luigi.Target:
-		return luigi.LocalTarget(os.path.join(cg.paths().build, "%s_%s_%s.timeavg.loom" % (self.lineage, self.target, self.time)))
+		return luigi.LocalTarget(os.path.join(dm.paths().build, "%s_%s_%s.timeavg.loom" % (self.lineage, self.target, self.time)))
 
 	def run(self) -> None:
 		with self.output().temporary_path() as out_file:

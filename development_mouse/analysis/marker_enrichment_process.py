@@ -3,6 +3,7 @@ import os
 import loompy
 import numpy as np
 import cytograph as cg
+import development_mouse as dm
 import luigi
 
 
@@ -16,7 +17,7 @@ class MarkerEnrichmentProcess(luigi.Task):
 		return cg.ClusterLayoutProcess(processname=self.processname)
 		
 	def output(self) -> luigi.Target:
-		return luigi.LocalTarget(os.path.join(cg.paths().build, "%s.enrichment.tab" % self.processname))
+		return luigi.LocalTarget(os.path.join(dm.paths().build, "%s.enrichment.tab" % self.processname))
 
 	def run(self) -> None:
 		with self.output().temporary_path() as f:

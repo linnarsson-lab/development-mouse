@@ -5,8 +5,9 @@ from scipy import sparse
 import numpy as np
 import networkx as nx
 import cytograph as cg
-import luigi
 import development_mouse as dm
+import luigi
+
 
 
 class ExportL1(luigi.Task):
@@ -39,7 +40,7 @@ class ExportL1(luigi.Task):
         folder: ``L1_[TISSUE]_exported``:
             Note this is kind of a hack to luigi, single files will not be regenerated but whole folder will.
         """
-        return luigi.LocalTarget(os.path.join(cg.paths().build, "L1_" + self.tissue + "_exported"))
+        return luigi.LocalTarget(os.path.join(dm.paths().build, "L1_" + self.tissue + "_exported"))
 
     def run(self) -> None:
         """
@@ -62,7 +63,7 @@ class ExportL1(luigi.Task):
                 os.mkdir(out_dir)
             dsagg = loompy.connect(self.input()[0].fn)
             logging.info("Computing auto-annotation")
-            aa = cg.AutoAnnotator(root=cg.paths().autoannotation)
+            aa = cg.AutoAnnotator(root=dm.paths().autoannotation)
             aa.annotate_loom(dsagg)
             aa.save_in_loom(dsagg)
 

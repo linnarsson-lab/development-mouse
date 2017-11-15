@@ -6,6 +6,7 @@ import pickle
 import logging
 import luigi
 import cytograph as cg
+import development_mouse as dm
 import loompy
 import numpy.core.defchararray as npstr
 
@@ -25,7 +26,7 @@ class PrepareTimepointPool(luigi.Task):
         return [cg.Sample(sample=s) for s in samples]
 
     def output(self) -> luigi.Target:
-        return luigi.LocalTarget(os.path.join(cg.paths().build, f"T0_{self.timepool}{'_' + self.tissue if self.tissue else ''}.loom"))
+        return luigi.LocalTarget(os.path.join(dm.paths().build, f"T0_{self.timepool}{'_' + self.tissue if self.tissue else ''}.loom"))
 
     def run(self) -> None:
         with self.output().temporary_path() as out_file:
@@ -74,7 +75,7 @@ class PrepareTimepointPool(luigi.Task):
             logging.info("%d of %d cells were valid", n_valid, n_total)
             
             classifier_loaded = False
-            classifier_path = os.path.join(cg.paths().build, "classifier.pickle")
+            classifier_path = os.path.join(dm.paths().build, "classifier.pickle")
             if os.path.exists(classifier_path):
                 try:
                     with open(classifier_path, "rb") as f:

@@ -3,6 +3,7 @@ import os
 import loompy
 import numpy as np
 import cytograph as cg
+import development_mouse as dm
 import luigi
 
 
@@ -19,9 +20,9 @@ class MarkerEnrichmentLineage(luigi.Task):
 		
 	def output(self) -> luigi.Target:
 		if self.time == "E7-E18":  # This is for backwards comaptibility we might remove this condition later
-			return luigi.LocalTarget(os.path.join(cg.paths().build, self.lineage + "_" + self.target + ".enrichment.tab"))
+			return luigi.LocalTarget(os.path.join(dm.paths().build, self.lineage + "_" + self.target + ".enrichment.tab"))
 		else:
-			return luigi.LocalTarget(os.path.join(cg.paths().build, "%s_%s_%s.enrichment.tab" % (self.lineage, self.target, self.time)))
+			return luigi.LocalTarget(os.path.join(dm.paths().build, "%s_%s_%s.enrichment.tab" % (self.lineage, self.target, self.time)))
 
 	def run(self) -> None:
 		with self.output().temporary_path() as f:

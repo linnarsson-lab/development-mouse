@@ -5,6 +5,7 @@ import numpy as np
 import logging
 import luigi
 import cytograph as cg
+import development_mouse as dm
 import loompy
 import logging
 from scipy import sparse
@@ -31,7 +32,7 @@ class ClusterLayoutProcess(luigi.Task):
 		return cg.StudyProcessPool(processname=self.processname)
 
 	def output(self) -> luigi.Target:
-		return luigi.LocalTarget(os.path.join(cg.paths().build, "%s.LJ.loom" % self.processname))
+		return luigi.LocalTarget(os.path.join(dm.paths().build, "%s.LJ.loom" % self.processname))
 
 	def run(self) -> None:
 		with self.output().temporary_path() as out_file:

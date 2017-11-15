@@ -6,6 +6,7 @@ import pickle
 import loompy
 import numpy as np
 import cytograph as cg
+import development_mouse as dm
 import luigi
 import scipy.cluster.hierarchy as hierarchy
 import numpy_groupies.aggregate_numpy as npg
@@ -24,7 +25,7 @@ class AggregateAnalysis(luigi.Task):  # Status: Ok
 		return cg.ClusterAnalysis(analysis=self.analysis)
 
 	def output(self) -> luigi.Target:
-		return luigi.LocalTarget(os.path.join(cg.paths().build, "Analysis_" + self.analysis + ".agg.loom"))
+		return luigi.LocalTarget(os.path.join(dm.paths().build, "Analysis_" + self.analysis + ".agg.loom"))
 
 	def run(self) -> None:
 		with self.output().temporary_path() as out_file:
@@ -33,7 +34,7 @@ class AggregateAnalysis(luigi.Task):  # Status: Ok
 			dsagg = loompy.connect(out_file)
 
 			logging.info("Computing auto-annotation")
-			aa = cg.AutoAnnotator(root=cg.paths().autoannotation)
+			aa = cg.AutoAnnotator(root=dm.paths().autoannotation)
 			aa.annotate_loom(dsagg)
 			aa.save_in_loom(dsagg)
 			ds.close()

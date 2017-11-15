@@ -6,6 +6,7 @@ from scipy import sparse
 import numpy as np
 import networkx as nx
 import cytograph as cg
+import development_mouse as dm
 import luigi
 
 
@@ -19,7 +20,7 @@ class PlotGraphAgeL1(luigi.Task):
 		return [cg.PrepareTissuePool(tissue=self.tissue), cg.AutoAnnotateL1(tissue=self.tissue)]
 
 	def output(self) -> luigi.Target:
-		return luigi.LocalTarget(os.path.join(cg.paths().build, "L1_" + self.tissue + ".age.png"))
+		return luigi.LocalTarget(os.path.join(dm.paths().build, "L1_" + self.tissue + ".age.png"))
 
 	def run(self) -> None:
 		logging.info("Plotting MKNN graph age")

@@ -6,6 +6,7 @@ import pickle
 import loompy
 import numpy as np
 import cytograph as cg
+import development_mouse as dm
 import luigi
 from collections import defaultdict
 
@@ -24,7 +25,7 @@ class StudyProcessPool(luigi.Task):
 		return cg.parse_project_requirements(process_obj)
 
 	def output(self) -> luigi.Target:
-		return luigi.LocalTarget(os.path.join(cg.paths().build, "%s.loom" % (self.analysis,)))
+		return luigi.LocalTarget(os.path.join(dm.paths().build, "%s.loom" % (self.analysis,)))
 		
 	def run(self) -> None:
 		process_obj = cg.AnalysesParser()[self.analysis]

@@ -5,6 +5,7 @@ import numpy as np
 import logging
 import luigi
 import cytograph as cg
+import development_mouse as dm
 import loompy
 import logging
 from scipy import sparse
@@ -36,7 +37,7 @@ class ClusterAnalysis(luigi.Task):  # Status: OK
         return cg.AnalysisPool(analysis=self.analysis)
 
     def output(self) -> luigi.Target:
-        return luigi.LocalTarget(os.path.join(cg.paths().build, "Analysis_" + self.analysis + ".loom"))
+        return luigi.LocalTarget(os.path.join(dm.paths().build, "Analysis_" + self.analysis + ".loom"))
 
     def run(self) -> None:
         with self.output().temporary_path() as out_file:
