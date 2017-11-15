@@ -6,6 +6,6 @@ from .development import *
 from .primary import *
 from .velocity import *
 # from .luigi_utils import *
-# from .cluster_config import cluster
-# from .memory_config import memory
-# from .skip_config import skip
+from .cluster_config import cluster
+from .memory_config import memory
+from .skip_config import skip
