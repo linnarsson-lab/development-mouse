@@ -130,8 +130,3 @@ class EstimateVelocity(luigi.Task):
                                  headaxislength=2.75, headlength=5, headwidth=4.8, quiver_scale=0.25)
             # NOTE: this parameters could be tuned. In particular min_mass!
             plt.savefig(os.path.join(out_dir, "L1_" + self.tissue + "_velocity_TSNE.pmg"))
-
-
-            import luigi
-
-            luigi.worker.Scheduler.
