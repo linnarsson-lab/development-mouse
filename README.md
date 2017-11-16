@@ -55,14 +55,14 @@ loom_samples/
 
 If it exists, the sample in `velocyto` will take precedence.
 
-Furthermore, you need a file in the current directory (typically, `adolescent-mouse`) named `pooling_specification.tab`, which gives a list of all the samples and their pool names. This file has four columns: *SampleID* (like `10X04_1`), *Pool* (like `Hippocampus`), *TimepointPool* (always `none`), *QC* (`OK` or `FAILED`), and *Project* (`Adolescent`). 
+Furthermore, you need a file in the current directory (typically, `development-mouse`) named `pooling_specification.tab`, which gives a list of all the samples and their pool names. This file has four columns: *SampleID* (like `10X04_1`), *Pool* (like `Hippocampus`), *TimepointPool* (always `none`), *QC* (`OK` or `FAILED`), and *Project* (`Adolescent`). 
 
 Samples with `QC == FAILED` will be ignored for all analyses.
 
 
 ## Running the pipeline
 
-1. Create a folder to hold the output of the build, e.g. `/data/proj/development/build_20171107`.
+1. Create a folder to hold the output of the build, e.g. `mkdir /data/proj/development/build_20171107`.
 
 2. Run `luigi`. For example:
 
@@ -80,9 +80,8 @@ Argument|Effect
 `--paths-samples /data/proj/chromium/loom_samples/` | a configuration of the `paths` object, setting the sample path
 `--paths-build /data/proj/development/build_20171107` | a configuration of the `paths` object, setting the build path
 
-##################
 Tasks Descriptions
-##################
+==================
 
 # Level1 tasks
 
@@ -92,4 +91,20 @@ Tasks Descriptions
 
 It is the main task to run. It triggers ExportL1 that in turn will trigger all level 1 set.
 
+# Velocity related
 
+below an example how to run velocity on a single sample
+
+## Preliminary Level1 Analysis
+
+If we want to make make sure that Level1 Analysis has been appropriatelly run, run:
+
+```
+luigi --local-scheduler --module development_mouse ExportL1 --tissue Forebrain_E9-11 --paths-samples /data/proj/chromium/loom_samples/ --paths-build /data/proj/development/build_20171115
+```
+
+## EstimateVelocity
+
+```
+nohup luigi --local-scheduler --module development_mouse EstimateVelocity --tissue Forebrain_E9-11 --paths-samples /data/proj/chromium/ --paths-build /data/proj/development/build_20171115 > ~/luigi_EstimateVelocity_EstimateVelocity.log &
+```
