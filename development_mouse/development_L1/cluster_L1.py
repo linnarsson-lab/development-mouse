@@ -135,7 +135,7 @@ class ClusterL1(luigi.Task):
 
 				min_pts = 10
 				eps_pct = 90
-				cls = cg.Clustering(method=cg.cluster().method, outliers=not cg.cluster().no_outliers, min_pts=min_pts, eps_pct=eps_pct)
+				cls = cg.Clustering(method=dm.cluster().method, outliers=not dm.cluster().no_outliers, min_pts=min_pts, eps_pct=eps_pct)
 				labels = cls.fit_predict(dsout)
 				dsout.set_attr("Clusters", labels, axis=1)
 				n_labels = np.max(labels) + 1

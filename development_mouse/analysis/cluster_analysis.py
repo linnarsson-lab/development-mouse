@@ -73,7 +73,7 @@ class ClusterAnalysis(luigi.Task):  # Status: OK
             dsout.set_attr("_X", tsne[:, 0], axis=1)
             dsout.set_attr("_Y", tsne[:, 1], axis=1)
 
-            cls = cg.Clustering(method=cg.cluster().method)
+            cls = cg.Clustering(method=dm.cluster().method)
             labels = cls.fit_predict(dsout)
             dsout.set_attr("Clusters", labels, axis=1)
             n_labels = np.max(labels) + 1
