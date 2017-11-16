@@ -57,9 +57,9 @@ class EstimateVelocity(luigi.Task):
             
             # Heuristics, we should set better heuristic and could add a config file with parameters for analysis
             max_expr_avg = 40
-            min_expr_counts = max(20, min(100, self.S.shape[1] * 2.25e-3))
-            min_cells_express = max(10, min(50, self.S.shape[1] * 1.5e-3))
-            N = max(1000, min(int((self.S.shape[1] / 1000)**(1 / 3) / 0.0008), 5000))
+            min_expr_counts = max(20, min(100, vlm.S.shape[1] * 2.25e-3))
+            min_cells_express = max(10, min(50, vlm.S.shape[1] * 1.5e-3))
+            N = max(1000, min(int((vlm.S.shape[1] / 1000)**(1 / 3) / 0.0008), 5000))
             min_avg_U = 0.01
             min_avg_S = 0.08
 
@@ -76,24 +76,24 @@ class EstimateVelocity(luigi.Task):
             vlm.filter_genes(by_cv_vs_mean=True)
 
             logging.info("Performing gene filtering by U detection")
-            self.score_detection_levels(min_expr_counts=0, min_cells_express=0,
+            vlm.score_detection_levels(min_expr_counts=0, min_cells_express=0,
                                         min_expr_counts_U=int(min_expr_counts / 2) + 1,
                                         min_cells_express_U=int(min_cells_express / 2) + 1)
             
-            if hasattr(self, "cluster_labels"):
+            if hasattr(vlm, "cluster_labels"):
                 logging.info("Performing gene filtering by cluster expression")
-                self.score_cluster_expression(min_avg_U=min_avg_U, min_avg_S=min_avg_S)
-                self.filter_genes(by_detection_levels=True, by_cluster_expression=True)
+                vlm.score_cluster_expression(min_avg_U=min_avg_U, min_avg_S=min_avg_S)
+                vlm.filter_genes(by_detection_levels=True, by_cluster_expression=True)
             else:
-                self.filter_genes(by_detection_levels=True)
+                vlm.filter_genes(by_detection_levels=True)
 
             vlm.normalize_by_total(plot=True)
 
             logging.info("Preparing dataset for velocity extimation")
             vlm.perform_PCA()
-            n_comps = int(np.where(np.diff(np.diff(np.cumsum(self.pca.explained_variance_ratio_)) > 0.002))[0][0])
+            n_comps = int(np.where(np.diff(np.diff(np.cumsum(vlm.pca.explained_variance_ratio_)) > 0.002))[0][0])
             n_comps = min(n_comps, 50)
-            k = int(min(1000, max(10, np.ceil(self.S.shape[1] * 0.02))))
+            k = int(min(1000, max(10, np.ceil(vlm.S.shape[1] * 0.02))))
 
             logging.info(f"Considering {n_comps} components and {k} nearest neighbours")
             vlm.knn_imputation(n_pca_dims=n_comps, k=k, balanced=True, b_sight=k * 8, b_maxl=k * 4, n_jobs=8)
