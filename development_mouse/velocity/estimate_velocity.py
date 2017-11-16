@@ -50,6 +50,7 @@ class EstimateVelocity(luigi.Task):
             
             logging.info("Loading loom file in memory as a VelocytoLoom object")
             vlm = vcy.VelocytoLoom(self.input()[0].fn)
+            vlm.set_clusters(cluster_labels=vlm.ca["ClusterName"])
             logging.info("Plotting report on spliced, ambiguous, unpliced fraction")
             vlm.plot_fractions(save2file=os.path.join(out_dir, "L1_" + self.tissue + "_sau_fractions.pdf"))
 
@@ -77,8 +78,8 @@ class EstimateVelocity(luigi.Task):
 
             logging.info("Performing gene filtering by U detection")
             vlm.score_detection_levels(min_expr_counts=0, min_cells_express=0,
-                                        min_expr_counts_U=int(min_expr_counts / 2) + 1,
-                                        min_cells_express_U=int(min_cells_express / 2) + 1)
+                                       min_expr_counts_U=int(min_expr_counts / 2) + 1,
+                                       min_cells_express_U=int(min_cells_express / 2) + 1)
             
             if hasattr(vlm, "cluster_labels"):
                 logging.info("Performing gene filtering by cluster expression")
