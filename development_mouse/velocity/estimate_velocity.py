@@ -33,29 +33,25 @@ class EstimateVelocity(luigi.Task):
         """
         Returns
         -------
-        folder: ``L1_[TISSUE]_velocity``:
-            Note this is kind of a hack to luigi, single files will not be regenerated but whole folder will.
+        file: ``velocity_[TISSUE].hdf5``
         """
-        return luigi.LocalTarget(os.path.join(dm.paths().build, "L1_" + self.tissue + "_velocity"))
+        return luigi.LocalTarget(os.path.join(dm.paths().build, f"velocity_{self.tissue}.hdf5"))
 
     def run(self) -> None:
-        """
-        Reads the output of `AggregateL1` and runs velocyto analysis:
+        """Run the velocity inference (without the projection on tsne) and generate the file:
+            velocity_[TISSUE].hdf5
         """
         logging = cg.logging(self, True)
-        logging.info("Exporting cluster data")
-        with self.output().temporary_path() as out_dir:
-            if not os.path.exists(out_dir):
-                os.mkdir(out_dir)
+        with self.output().temporary_path() as out_file:
             
             logging.info("Loading loom file in memory as a VelocytoLoom object")
             vlm = vcy.VelocytoLoom(self.input()[0].fn)
-            vlm.set_clusters(cluster_labels=vlm.ca["ClusterName"])
-            logging.info("Plotting report on spliced, ambiguous, unpliced fraction")
-            vlm.plot_fractions(save2file=os.path.join(out_dir, "L1_" + self.tissue + "_sau_fractions.pdf"))
+
+            logging.info("Use `Cluster` column_attr to set clusters and _X, _Y to set the tsne embedding")
+            vlm.set_clusters(cluster_labels=vlm.ca["Clusters"])
+            vlm.ts = np.column_stack([vlm.ca["_X"], vlm.ca["_Y"]])  # load the embedding from previous analysis
 
             # NOTE: code below is basically identical to `default_filter_and_norm` but with the exception of adjust_totS_totU
-            
             # Heuristics, we should set better heuristic and could add a config file with parameters for analysis
             max_expr_avg = 40
             min_expr_counts = max(20, min(100, vlm.S.shape[1] * 2.25e-3))
@@ -110,22 +106,4 @@ class EstimateVelocity(luigi.Task):
             vlm.calculate_shift(assumption="constant_velocity")
             vlm.extrapolate_cell_at_t(delta_t=1)  # NOTE: we should determine delta t in a better way
 
-            vlm.ts = np.column_stack([vlm.ca["_X"], vlm.ca["_Y"]])  # load the embedding from previous analysis
-
-            logging.info(f"Estimating transition probability, this step will require time")
-            n_neighbors = int(vlm.S.shape[1] / 5)
-            vlm.estimate_transition_prob(hidim="Sx_sz", embed="ts", transform="sqrt",
-                                         n_neighbors=n_neighbors, knn_random=True, sampled_fraction=1, n_jobs=16)
-            # NOTE here we might want to tune the number of jobs used in relation to the number of concurrent tasks
-            # NOTE here we might want to change the sampled fraction to a lower number to make things faster
-
-            vlm.calculate_embedding_shift(sigma_corr=0.05)  # NOTE: this parameter could be tuned
-
-            vlm.calculate_grid_arrows(smooth=0.8, steps=(40, 40), n_neighbors=300)  # NOTE: this parameters could be tuned
-
-            plt.figure(None, (20, 20))
-            vlm.plot_grid_arrows(scatter_kwargs_dict={"alpha": 0.35, "lw": 0.35, "edgecolor": "0.4", "s": 38, "rasterized": True},
-                                 min_mass=10, angles='xy', scale_units='xy',
-                                 headaxislength=2.75, headlength=5, headwidth=4.8, quiver_scale=0.25)
-            # NOTE: this parameters could be tuned. In particular min_mass!
-            plt.savefig(os.path.join(out_dir, "L1_" + self.tissue + "_velocity_TSNE.png"))
+            vlm.to_hdf5(out_file)

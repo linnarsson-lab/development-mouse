@@ -9,7 +9,6 @@ import development_mouse as dm
 import luigi
 
 
-
 class ExportL1(luigi.Task):
     """Luigi Task to export summary files
     """
