@@ -127,4 +127,4 @@ class EstimateVelocity(luigi.Task):
                                  min_mass=10, angles='xy', scale_units='xy',
                                  headaxislength=2.75, headlength=5, headwidth=4.8, quiver_scale=0.25)
             # NOTE: this parameters could be tuned. In particular min_mass!
-            plt.savefig(os.path.join(out_dir, "L1_" + self.tissue + "_velocity_TSNE.pmg"))
+            plt.savefig(os.path.join(out_dir, "L1_" + self.tissue + "_velocity_TSNE.png"))
