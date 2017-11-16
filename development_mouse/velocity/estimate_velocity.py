@@ -26,10 +26,8 @@ class EstimateVelocity(luigi.Task):
             passing ``tissue``
         """
         # NOTE: not sure it needs AggregateL1
-        return [
-            dm.AggregateL1(tissue=self.tissue),
-            dm.ClusterL1(tissue=self.tissue)
-        ]
+        return [dm.ClusterL1(tissue=self.tissue),
+                dm.AggregateL1(tissue=self.tissue)]
 
     def output(self) -> luigi.Target:
         """

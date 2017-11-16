@@ -2,7 +2,6 @@ from typing import *
 import os
 from shutil import copyfile
 import numpy as np
-#import logging
 import luigi
 import gc
 import cytograph as cg
@@ -25,118 +24,115 @@ import hdbscan
 from sklearn.cluster import DBSCAN
 
 
-
 class ClusterL1(luigi.Task):
-	"""Level 1 Clustering
-	"""
+    """Level 1 Clustering
+    """
 
-	tissue = luigi.Parameter()
-	"""str: Name of the tissue from tool specification file"""
-	n_genes = luigi.IntParameter(default=1000)
-	"""int, default=1000
-		The number of genes used in manifold learning"""
-	manifold_learning = luigi.IntParameter(default=1)
-	"""int, default=1
-		Whether to use `cytograph.ManifoldLearning` or `cytograph.ManifoldLearning2`"""
-	gtsne = luigi.BoolParameter(default=True)
-	"""bool, default=True
-		Use graph t-SNE for layout"""
-	alpha = luigi.FloatParameter(default=1)
-	"""float, default=1
-		The scale parameter for multiscale KNN"""
-	filter_cellcycle = luigi.Parameter(default=None)
-	"""filepath, default=None
-		The path of a file containing as rows the gene symbol of genes to excluded (Note: despite the name it can be used for any gene set)"""
-	layer = luigi.Parameter(default=None)
-	"""str, default=None
-		This specifies wich layers is used for manifold learning (i.e. the matrix used to compute PCA).
-		Currently it only has effects when using `cytograph.ManifoldLearning` and not `cytograph.ManifoldLearning2`"""
+    tissue = luigi.Parameter(description="str:\nName of the tissue from tool specification file")
+    
+    n_genes = luigi.IntParameter(default=1000,
+                                 description="""int, default=1000\nThe number of genes used in manifold learning""")
+    
+    manifold_learning = luigi.IntParameter(default=1,
+                                           description="int, default=1\nWhether to use `cytograph.ManifoldLearning` or `cytograph.ManifoldLearning2`")
+    
+    gtsne = luigi.BoolParameter(default=True,
+                                description="bool, default=True\nUse graph t-SNE for layout")
 
-	def requires(self) -> luigi.Task:
-		return dm.PrepareTissuePool(tissue=self.tissue)
+    alpha = luigi.FloatParameter(default=1,
+                                 description="float, default=1\nThe scale parameter for multiscale KNN")
+    
+    filter_cellcycle = luigi.Parameter(default=None,
+                                       description="filepath, default=None\nThe path of a file containing as rows the gene symbol of genes to excluded (Note: despite the name it can be used for any gene set)")
 
-	def output(self) -> luigi.Target:
-		"""
-		Returns
-		-------
-		file: ``L1_[TISSUE].loom``
+    layer = luigi.Parameter(default=None,
+                            description="str, default=None\nThis specifies wich layers is used for manifold learning (i.e. the matrix used to compute PCA).Currently it only has effects when using `cytograph.ManifoldLearning` and not `cytograph.ManifoldLearning2`")
 
-		Reads the output of `PrepareTissuePool` and does:
-			- runs the `cytograph.batch_scan_layers` to remove cells that are not valid (almost creating a copy)
-			- runs `cytograph.ManifoldLearning` or `cytograph.ManifoldLearning2`
-			- runs `cytograph.Clustering` on the learned mainfild
-			- if `cytograph.ManifoldLearning2` also runs `cytograph.Merger`
-		"""
-		return luigi.LocalTarget(os.path.join(dm.paths().build, "L1_" + self.tissue + ".loom"))
+    def requires(self) -> luigi.Task:
+        return dm.PrepareTissuePool(tissue=self.tissue)
 
-	def run(self) -> None:
-		"""
-		Other Parameters
-		----------------
-		cluster_method: `cluster_config.cluster.method`, default="dbscan"
-			Select the method for clustering. Valid: "hdbscan", "dbscan", "multilev", "wmultilev", "mknn_louvain", "louvain" (same as None)
-		cluster_no_outliers: `cluster_config.cluster.no_outliers`, default=False
-			Whether to consider in the clustering cells that have been marked as outliers in `PrepareTissuePool`
-		memory_batch: `memory_config.memory.batch`, default=2000
-			The size of the batches that are used by `cytograph.batch_scan_layers`
-		"""
-		logging = cg.logging(self)
-		with self.output().temporary_path() as out_file:
-			ds = loompy.connect(self.input().fn)
-			dsout: loompy.LoomConnection = None
-			logging.info("Removing invalid cells")
-			for (ix, selection, vals) in ds.batch_scan_layers(cells=np.where(ds.col_attrs["_Valid"] == 1)[0], layers=ds.layer.keys(), batch_size=dm.memory().axis1, axis=1):
-				ca = {key: val[selection] for key, val in ds.col_attrs.items()}
-				if dsout is None:
-					# NOTE Loompy Create should support multilayer !!!!
-					if type(vals) is dict:
-						dsout = loompy.create(out_file, vals[""], row_attrs=ds.row_attrs, col_attrs=ca, dtype=vals[""].dtype)
-						for layername, layervalues in vals.items():
-							if layername != "":
-								dsout.set_layer(layername, layervalues, dtype=layervalues.dtype)
-						dsout = loompy.connect(out_file)
-					else:
-						loompy.create(out_file, vals, row_attrs=ds.row_attrs, col_attrs=ca)
-						dsout = loompy.connect(out_file)
-				else:
-					dsout.add_columns(vals, ca)
-			# dsout.close() causes an exception; disabling gc fixes it. See https://github.com/h5py/h5py/issues/888
-			gc.disable()
-			dsout.close()
-			gc.enable()
+    def output(self) -> luigi.Target:
+        """
+        Returns
+        -------
+        file: ``L1_[TISSUE].loom``
 
-			if self.manifold_learning == 2:
-				logging.info("Learning the manifold")
-				ds = loompy.connect(out_file)
-				ml = cg.ManifoldLearning2(n_genes=self.n_genes, gtsne=self.gtsne, alpha=self.alpha, filter_cellcycle=self.filter_cellcycle, layer=self.layer)
-				(knn, mknn, tsne) = ml.fit(ds)
-				ds.set_edges("KNN", knn.row, knn.col, knn.data, axis=1)
-				ds.set_edges("MKNN", mknn.row, mknn.col, mknn.data, axis=1)
-				ds.set_attr("_X", tsne[:, 0], axis=1)
-				ds.set_attr("_Y", tsne[:, 1], axis=1)
+        Reads the output of `PrepareTissuePool` and does:
+            - runs the `cytograph.batch_scan_layers` to remove cells that are not valid (almost creating a copy)
+            - runs `cytograph.ManifoldLearning` or `cytograph.ManifoldLearning2`
+            - runs `cytograph.Clustering` on the learned mainfild
+            - if `cytograph.ManifoldLearning2` also runs `cytograph.Merger`
+        """
+        return luigi.LocalTarget(os.path.join(dm.paths().build, "L1_" + self.tissue + ".loom"))
 
-				logging.info("Clustering on the manifold")
-				cls = cg.Clustering(method="mknn_louvain", min_pts=10)
-				labels = cls.fit_predict(ds)
-				ds.set_attr("Clusters", labels, axis=1)
-				logging.info(f"Found {labels.max() + 1} clusters")
-				cg.Merger(min_distance=0.2).merge(ds)
-				logging.info(f"Merged to {ds.col_attrs['Clusters'].max() + 1} clusters")
-				ds.close()
-			else:
-				dsout = loompy.connect(out_file)
-				ml = cg.ManifoldLearning(n_genes=self.n_genes, gtsne=self.gtsne, alpha=self.alpha, filter_cellcycle=self.filter_cellcycle, layer=self.layer)
-				(knn, mknn, tsne) = ml.fit(dsout)
+    def run(self) -> None:
+        """
+        Other Parameters
+        ----------------
+        cluster_method: `cluster_config.cluster.method`, default="dbscan"
+            Select the method for clustering. Valid: "hdbscan", "dbscan", "multilev", "wmultilev", "mknn_louvain", "louvain" (same as None)
+        cluster_no_outliers: `cluster_config.cluster.no_outliers`, default=False
+            Whether to consider in the clustering cells that have been marked as outliers in `PrepareTissuePool`
+        memory_batch: `memory_config.memory.batch`, default=2000
+            The size of the batches that are used by `cytograph.batch_scan_layers`
+        """
+        logging = cg.logging(self)
+        with self.output().temporary_path() as out_file:
+            ds = loompy.connect(self.input().fn)
+            dsout: loompy.LoomConnection = None
+            logging.info("Removing invalid cells")
+            for (ix, selection, vals) in ds.batch_scan_layers(cells=np.where(ds.col_attrs["_Valid"] == 1)[0], layers=ds.layer.keys(), batch_size=dm.memory().axis1, axis=1):
+                ca = {key: val[selection] for key, val in ds.col_attrs.items()}
+                if dsout is None:
+                    # NOTE Loompy Create should support multilayer !!!!
+                    if type(vals) is dict:
+                        dsout = loompy.create(out_file, vals[""], row_attrs=ds.row_attrs, col_attrs=ca, dtype=vals[""].dtype)
+                        for layername, layervalues in vals.items():
+                            if layername != "":
+                                dsout.set_layer(layername, layervalues, dtype=layervalues.dtype)
+                        dsout = loompy.connect(out_file)
+                    else:
+                        loompy.create(out_file, vals, row_attrs=ds.row_attrs, col_attrs=ca)
+                        dsout = loompy.connect(out_file)
+                else:
+                    dsout.add_columns(vals, ca)
+            # dsout.close() causes an exception; disabling gc fixes it. See https://github.com/h5py/h5py/issues/888
+            gc.disable()
+            dsout.close()
+            gc.enable()
 
-				dsout.set_edges("KNN", knn.row, knn.col, knn.data, axis=1)
-				dsout.set_edges("MKNN", mknn.row, mknn.col, mknn.data, axis=1)
-				dsout.set_attr("_X", tsne[:, 0], axis=1)
-				dsout.set_attr("_Y", tsne[:, 1], axis=1)
+            if self.manifold_learning == 2:
+                logging.info("Learning the manifold")
+                ds = loompy.connect(out_file)
+                ml = cg.ManifoldLearning2(n_genes=self.n_genes, gtsne=self.gtsne, alpha=self.alpha, filter_cellcycle=self.filter_cellcycle, layer=self.layer)
+                (knn, mknn, tsne) = ml.fit(ds)
+                ds.set_edges("KNN", knn.row, knn.col, knn.data, axis=1)
+                ds.set_edges("MKNN", mknn.row, mknn.col, mknn.data, axis=1)
+                ds.set_attr("_X", tsne[:, 0], axis=1)
+                ds.set_attr("_Y", tsne[:, 1], axis=1)
 
-				min_pts = 10
-				eps_pct = 90
-				cls = cg.Clustering(method=dm.cluster().method, outliers=not dm.cluster().no_outliers, min_pts=min_pts, eps_pct=eps_pct)
-				labels = cls.fit_predict(dsout)
-				dsout.set_attr("Clusters", labels, axis=1)
-				n_labels = np.max(labels) + 1
-				dsout.close()
+                logging.info("Clustering on the manifold")
+                cls = cg.Clustering(method="mknn_louvain", min_pts=10)
+                labels = cls.fit_predict(ds)
+                ds.set_attr("Clusters", labels, axis=1)
+                logging.info(f"Found {labels.max() + 1} clusters")
+                cg.Merger(min_distance=0.2).merge(ds)
+                logging.info(f"Merged to {ds.col_attrs['Clusters'].max() + 1} clusters")
+                ds.close()
+            else:
+                dsout = loompy.connect(out_file)
+                ml = cg.ManifoldLearning(n_genes=self.n_genes, gtsne=self.gtsne, alpha=self.alpha, filter_cellcycle=self.filter_cellcycle, layer=self.layer)
+                (knn, mknn, tsne) = ml.fit(dsout)
+
+                dsout.set_edges("KNN", knn.row, knn.col, knn.data, axis=1)
+                dsout.set_edges("MKNN", mknn.row, mknn.col, mknn.data, axis=1)
+                dsout.set_attr("_X", tsne[:, 0], axis=1)
+                dsout.set_attr("_Y", tsne[:, 1], axis=1)
+
+                min_pts = 10
+                eps_pct = 90
+                cls = cg.Clustering(method=dm.cluster().method, outliers=not dm.cluster().no_outliers, min_pts=min_pts, eps_pct=eps_pct)
+                labels = cls.fit_predict(dsout)
+                dsout.set_attr("Clusters", labels, axis=1)
+                n_labels = np.max(labels) + 1
+                dsout.close()
