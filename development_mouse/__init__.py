@@ -9,4 +9,5 @@ from .luigi_utils import *
 from .tests import *
 from .cluster_config import cluster
 from .memory_config import memory
+from .threads_config import threads
 from .skip_config import skip
