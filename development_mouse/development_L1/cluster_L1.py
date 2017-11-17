@@ -29,22 +29,16 @@ class ClusterL1(luigi.Task):
     """
 
     tissue = luigi.Parameter(description="str:\nName of the tissue from tool specification file")
-    
     n_genes = luigi.IntParameter(default=1000,
                                  description="""int, default=1000\nThe number of genes used in manifold learning""")
-    
     manifold_learning = luigi.IntParameter(default=1,
                                            description="int, default=1\nWhether to use `cytograph.ManifoldLearning` or `cytograph.ManifoldLearning2`")
-    
     gtsne = luigi.BoolParameter(default=True,
                                 description="bool, default=True\nUse graph t-SNE for layout")
-
     alpha = luigi.FloatParameter(default=1,
                                  description="float, default=1\nThe scale parameter for multiscale KNN")
-    
     filter_cellcycle = luigi.Parameter(default=None,
                                        description="filepath, default=None\nThe path of a file containing as rows the gene symbol of genes to excluded (Note: despite the name it can be used for any gene set)")
-
     layer = luigi.Parameter(default=None,
                             description="str, default=None\nThis specifies wich layers is used for manifold learning (i.e. the matrix used to compute PCA).Currently it only has effects when using `cytograph.ManifoldLearning` and not `cytograph.ManifoldLearning2`")
 

@@ -18,6 +18,7 @@ setup(
 		'luigi',
 		'polo',
 		'numpy-groupies'
+		'velocyto'
 	],
 	
 	# metadata
