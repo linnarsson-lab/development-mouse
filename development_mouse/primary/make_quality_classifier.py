@@ -14,7 +14,7 @@ import development_mouse as dm
 import luigi
 
 
-class TrainClassifier(luigi.Task):
+class MakeQualityClassifier(luigi.Task):
     """
     Luigi Task to train a quality classifier using summary statistics such as number of spliced, unspliced, mitocondrial, ribosomal
     """

@@ -8,6 +8,7 @@ import cytograph as cg
 import development_mouse as dm
 import loompy
 import logging
+import pickle
 from scipy import sparse
 from scipy.special import polygamma
 from sklearn.cluster import AgglomerativeClustering, KMeans, Birch
@@ -15,7 +16,7 @@ from sklearn.decomposition import PCA, IncrementalPCA, FastICA
 from sklearn.manifold import TSNE
 from sklearn.metrics import pairwise_distances
 from sklearn.metrics.pairwise import pairwise_distances
-from sklearn.neighbors import BallTree, NearestNeighbors, kneighbors_graph
+from sklearn.neighbors import BallTree, NearestNeighbors, kneighbors_graph, KNeighborsClassifier
 from sklearn.preprocessing import scale
 from sklearn.svm import SVR
 from scipy.stats import ks_2samp
@@ -43,7 +44,7 @@ class ClusterL1(luigi.Task):
                             description="str, default=None\nThis specifies wich layers is used for manifold learning (i.e. the matrix used to compute PCA).Currently it only has effects when using `cytograph.ManifoldLearning` and not `cytograph.ManifoldLearning2`")
 
     def requires(self) -> luigi.Task:
-        return dm.PrepareTissuePool(tissue=self.tissue)
+        return [dm.PrepareTissuePool(tissue=self.tissue), dm.MakeQualityClassifier(), dm.NameQualityClusters()]
 
     def output(self) -> luigi.Target:
         """
@@ -72,8 +73,27 @@ class ClusterL1(luigi.Task):
         """
         logging = cg.logging(self)
         with self.output().temporary_path() as out_file:
-            ds = loompy.connect(self.input().fn)
+            ds = loompy.connect(self.input()[0].fn)
             dsout: loompy.LoomConnection = None
+
+            logging.info("Deserializing QC Classifier")
+            knc: KNeighborsClassifier = pickle.load(open(self.input()[2].fn, "rb"))
+            logging.info("Reading NameQualityCluster file")
+            cluster_mapping = {int(i.split(":")[0]): i.split(":")[1] for i in open(self.input[1].fn).read().rstrip().split()}
+            initial_cell_size = ds.col_attrs["SplicedTotal"]
+            initial_Ucell_size = ds.col_attrs["UnsplicedTotal"]
+            detected_genes = ds.col_attrs["TotalMolNoAmbiguous"]
+            mito_size = ds.col_attrs["MitocondrialTotal"]
+            ribo_size = ds.col_attrs["RibosomalTotal"]
+            X = np.column_stack((initial_cell_size, initial_Ucell_size, detected_genes, mito_size, ribo_size))
+
+            logging.info("Using the QC Classifier to set QualityClass")
+            predicted = knc.predict(X)
+            qc_luster_labels = np.array([cluster_mapping[i] for i in predicted])
+            ds.set_attr(name="QualityClass", values=qc_luster_labels, axis=1)
+
+            # NOTE for now the quality class is only written and not used anywhere 
+
             logging.info("Removing invalid cells")
             for (ix, selection, vals) in ds.batch_scan_layers(cells=np.where(ds.col_attrs["_Valid"] == 1)[0], layers=ds.layer.keys(), batch_size=dm.memory().axis1, axis=1):
                 ca = {key: val[selection] for key, val in ds.col_attrs.items()}
