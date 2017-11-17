@@ -56,15 +56,34 @@ class PrepareTissuePool(luigi.Task):
 				ds.set_attr("_Total", mols, axis=1)
 				ds.set_attr("_NGenes", genes, axis=1)
 				
-				logging.info("Computing mito/ribo ratio for " + sample)
+				logging.info(f"Computing mito and ribo for {sample}")
 				mito = np.where(npstr.startswith(ds.row_attrs["Gene"], "mt-"))[0]
 				ribo = np.where(npstr.startswith(ds.row_attrs["Gene"], "Rpl"))[0]
 				ribo = np.union1d(ribo, np.where(npstr.startswith(ds.row_attrs["Gene"], "Rps"))[0])
 				if len(ribo) > 0 and len(mito) > 0:
 					mitox = ds[mito, :]
 					ribox = ds[ribo, :]
-					ratio = (mitox.sum(axis=0) + 1) / (ribox.sum(axis=0) + 1)
+					mitox_sum = mitox.sum(0)
+					ribox_sum = ribox.sum(0)
+					ratio = (mitox_sum + 1) / (ribox_sum + 1)
 					ds.set_attr("MitoRiboRatio", ratio, axis=1)
+					ds.set_attr("MitocondrialTotal", mitox_sum, axis=1)
+					ds.set_attr("RibosomalTotal", ribox_sum, axis=1)
+
+				if not dm.paths().not_use_velocyto:
+					logging.info("Computing detected genes, total spliced molecules, total unspliced molecules")
+					initial_cell_size = np.zeros(ds.shape[1])
+					initial_Ucell_size = np.zeros(ds.shape[1])
+					detected_genes = np.zeros(ds.shape[1])
+					for (ix, indexes, val) in ds.batch_scan_layers(cells=None, genes=None, axis=1, batch_size=dm.memory().axis1):
+						initial_cell_size[indexes] = val["spliced"].sum(0)
+						initial_Ucell_size[indexes] = val["unspliced"].sum(0)
+						detected_genes[indexes] = ((val["spliced"] + val["unspliced"]) > 0).sum(0)
+
+					ds.set_attr("SplicedTotal", initial_cell_size, axis=1)
+					ds.set_attr("UnsplicedTotal", initial_Ucell_size, axis=1)
+					ds.set_attr("TotalMolNoAmbiguous", detected_genes, axis=1)
+
 				ds.close()
 
 			logging.info("Creating combined loom file")
