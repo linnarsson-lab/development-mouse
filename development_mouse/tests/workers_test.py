@@ -22,5 +22,5 @@ class WorkersTest(luigi.Task):
         """
         with self.output().temporary_path() as out_file:
             f = open(out_file, "w")
-            f.write(str(self.deps))
+            f.write(str(self.__dict__))
             f.close()
