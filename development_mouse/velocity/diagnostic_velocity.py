@@ -20,9 +20,11 @@ class DiagnosticVelocity(luigi.Task):
         """
         Arguments
         ---------
+        `ClusterL1`:
+            passing ``tissue``
         `AggregateL1`:
             passing ``tissue``
-        `ClusterL1`:
+        `ExportL1`:
             passing ``tissue``
         """
         # NOTE: not sure it needs AggregateL1

@@ -21,9 +21,7 @@ class VisualizeVelocity(luigi.Task):
         """
         Arguments
         ---------
-        `AggregateL1`:
-            passing ``tissue``
-        `ClusterL1`:
+        `EstimateVelocity`:
             passing ``tissue``
         """
         # NOTE: not sure it needs AggregateL1
@@ -61,7 +59,8 @@ class VisualizeVelocity(luigi.Task):
             
             # NOTE: IMPORTANT here I actually modify a luigi Target, this is not considered good practice
             # Dump to a temp and only substitute the original file, atomically just before the folder velocity_[TISSUE]_export get created
-            tmp_file = tempfile.mktemp()
+            tmp_file = tempfile.mktemp(dir=os.path.join(dm.paths().build))
+            # I get if I leave the default dir: OSError: [Errno 18] Invalid cross-device link: '/tmp/tmphnvw5x6_' -> '/data/proj/development/build_20171115/velocity_Forebrain_E9-11.hdf5'
             vlm.to_hdf5(tmp_file)
 
             vlm.calculate_embedding_shift(sigma_corr=0.05)  # NOTE: this parameter could be tuned

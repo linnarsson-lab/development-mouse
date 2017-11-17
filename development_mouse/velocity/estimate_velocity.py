@@ -20,9 +20,9 @@ class EstimateVelocity(luigi.Task):
         """
         Arguments
         ---------
-        `AggregateL1`:
-            passing ``tissue``
         `ClusterL1`:
+            passing ``tissue``
+        `AggregateL1`:
             passing ``tissue``
         """
         # NOTE: not sure it needs AggregateL1
