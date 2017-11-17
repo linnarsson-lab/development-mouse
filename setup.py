@@ -12,6 +12,7 @@ setup(
 		'numpy',
 		'scikit-learn',
 		'scipy',
+		'pandas',  # There is one function call to read excell files
 		'networkx',
 		'cytograph',
 		'luigi',
