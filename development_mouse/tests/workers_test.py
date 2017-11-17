@@ -13,5 +13,4 @@ class WorkersTest(luigi.Task):
         with self.output().temporary_path() as out_file:
             f = open(out_file, "w")
             f.write(str(self.get_params()))
-            luigi.scheduler.RU
             f.close()
