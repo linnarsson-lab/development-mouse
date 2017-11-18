@@ -44,7 +44,9 @@ class ClusterL1(luigi.Task):
                             description="str, default=None\nThis specifies wich layers is used for manifold learning (i.e. the matrix used to compute PCA).Currently it only has effects when using `cytograph.ManifoldLearning` and not `cytograph.ManifoldLearning2`")
 
     def requires(self) -> luigi.Task:
-        return [dm.PrepareTissuePool(tissue=self.tissue), dm.NameQualityClusters()]  # dm.MakeQualityClassifier()
+        return {"PrepareTissuePool": dm.PrepareTissuePool(tissue=self.tissue),
+                "NameQualityClusters": dm.NameQualityClusters(),
+                "MakeQualityClassifier": dm.MakeQualityClassifier()}
 
     def output(self) -> luigi.Target:
         """
@@ -73,11 +75,11 @@ class ClusterL1(luigi.Task):
         """
         logging = cg.logging(self)
         with self.output().temporary_path() as out_file:
-            ds = loompy.connect(self.input()[0].fn)
+            ds = loompy.connect(self.input()["PrepareTissuePool"].fn)
             dsout: loompy.LoomConnection = None
 
             logging.info("Deserializing QC Classifier")
-            knc: KNeighborsClassifier = pickle.load(open(self.input()[2].fn, "rb"))
+            knc: KNeighborsClassifier = pickle.load(open(self.input()["MakeQualityClassifier"].fn, "rb"))
             logging.info("Reading NameQualityCluster file")
             cluster_mapping = {int(i.split(":")[0]): i.split(":")[1] for i in open(self.input[1].fn).read().rstrip().split()}
             initial_cell_size = ds.col_attrs["SplicedTotal"]

@@ -25,16 +25,15 @@ class AnalysisPool(luigi.Task):  # Status: check the filter manager
 		return dm.parse_punchcard_requirements(punchcard_obj)
 
 	def output(self) -> luigi.Target:
-		return luigi.LocalTarget(os.path.join(dm.paths().build, "%s.loom" % (self.card,)))
+		return luigi.LocalTarget(os.path.join(dm.paths().build, f"{self.card}.loom"))
 		
 	def run(self) -> None:
 		analysis_obj = cg.AnalysesParser()[self.card]
-		logging.debug("Generating the pooled file %s.loom" % self.card)
+		logging.debug(f"Generating the pooled file {self.card}.loom")
 		with self.output().temporary_path() as out_file:
-			dsout = None  # type: loompy.LoomConnection
-			# The following assumes assumes that for every process taskwrapper the
-			# first tow requirements yielded are the clustering and the autoannotation
-			# For more flexibility return a dictionary
+			dsout: loompy.LoomConnection = None
+			# Try to drop the assumptio that 
+			# clustering and the autoannotation are the i
 			for clustered, autoannotated, *others in self.input():
 				logging.debug("Adding cells from the source file %s" % clustered.fn)
 				ds = loompy.connect(clustered.fn)
