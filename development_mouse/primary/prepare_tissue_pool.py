@@ -41,6 +41,7 @@ class PrepareTissuePool(luigi.Task):
 			sample_files = [s.fn for s in self.input()]
 			for sample in sample_files:
 				# Connect and perform file-specific cell validation
+				logging.info(f"Loading {sample}")
 				ds = loompy.connect(sample)
 
 				if metadata is not None:
