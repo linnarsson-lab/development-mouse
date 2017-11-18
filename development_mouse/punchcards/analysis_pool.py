@@ -15,21 +15,21 @@ class AnalysisPool(luigi.Task):  # Status: check the filter manager
 	"""
 	Luigi Task to generate a particular slice of the data as specified by a punchcard
 
-	`analysis` needs to match the name specified in the .yaml file in the folder ../cg-analysis
+	`analysis` needs to match the name specified in the .yaml file in the folder ../punchcards
 	"""
 	
-	analysis = luigi.Parameter()
+	card = luigi.Parameter()
 
 	def requires(self) -> Iterator[luigi.Task]:
-		punchcard_obj = dm.PunchcardParser()[self.analysis]
+		punchcard_obj = dm.PunchcardParser()[self.card]
 		return dm.parse_punchcard_requirements(punchcard_obj)
 
 	def output(self) -> luigi.Target:
-		return luigi.LocalTarget(os.path.join(dm.paths().build, "%s.loom" % (self.analysis,)))
+		return luigi.LocalTarget(os.path.join(dm.paths().build, "%s.loom" % (self.card,)))
 		
 	def run(self) -> None:
-		analysis_obj = cg.AnalysesParser()[self.analysis]
-		logging.debug("Generating the pooled file %s.loom" % self.analysis)
+		analysis_obj = cg.AnalysesParser()[self.card]
+		logging.debug("Generating the pooled file %s.loom" % self.card)
 		with self.output().temporary_path() as out_file:
 			dsout = None  # type: loompy.LoomConnection
 			# The following assumes assumes that for every process taskwrapper the

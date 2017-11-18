@@ -92,7 +92,7 @@ class ClusterL1(luigi.Task):
             qc_luster_labels = np.array([cluster_mapping[i] for i in predicted])
             ds.set_attr(name="QualityClass", values=qc_luster_labels, axis=1)
 
-            # NOTE for now the quality class is only written and not used anywhere 
+            # NOTE for now the quality class is only written and not used anywhere
 
             logging.info("Removing invalid cells")
             for (ix, selection, vals) in ds.batch_scan_layers(cells=np.where(ds.col_attrs["_Valid"] == 1)[0], layers=ds.layer.keys(), batch_size=dm.memory().axis1, axis=1):
