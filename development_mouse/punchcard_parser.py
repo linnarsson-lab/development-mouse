@@ -13,8 +13,9 @@ import copy
 analysis_type_dict = {"Level1": Level1, "PerformAnalysis": PerformAnalysis}
 
 
-class AnalysesParser(object):  # Status: needs to be run but looks ok
-    def __init__(self, root: str = "../cg-analysis") -> None:
+class PunchcardParser(object):  # Status: needs to be run but looks ok
+    def __init__(self, root: str = "../punchcards") -> None:
+        # NOTE: root should be changed to a directory defined in a ~/.cytograph_rc file
         self.root = root
         self._analyses_dict = {}  # type: Dict
         self.model = {}  # type: Dict

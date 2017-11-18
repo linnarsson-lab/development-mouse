@@ -13,7 +13,7 @@ from collections import defaultdict
 
 class AnalysisPool(luigi.Task):  # Status: check the filter manager
 	"""
-	Luigi Task to generate a particular slice of the data as specified by a description file
+	Luigi Task to generate a particular slice of the data as specified by a punchcard
 
 	`analysis` needs to match the name specified in the .yaml file in the folder ../cg-analysis
 	"""
@@ -21,8 +21,8 @@ class AnalysisPool(luigi.Task):  # Status: check the filter manager
 	analysis = luigi.Parameter()
 
 	def requires(self) -> Iterator[luigi.Task]:
-		analysis_obj = cg.AnalysesParser()[self.analysis]
-		return cg.parse_analysis_requirements(analysis_obj)
+		punchcard_obj = dm.PunchcardParser()[self.analysis]
+		return dm.parse_punchcard_requirements(punchcard_obj)
 
 	def output(self) -> luigi.Target:
 		return luigi.LocalTarget(os.path.join(dm.paths().build, "%s.loom" % (self.analysis,)))
