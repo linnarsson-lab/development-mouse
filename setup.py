@@ -17,7 +17,7 @@ setup(
 		'cytograph',
 		'luigi',
 		'polo',
-		'numpy-groupies'
+		'numpy-groupies',
 		'velocyto'
 	],
 	
