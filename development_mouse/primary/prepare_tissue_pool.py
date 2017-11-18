@@ -57,9 +57,9 @@ class PrepareTissuePool(luigi.Task):
 				ds.set_attr("_NGenes", genes, axis=1)
 				
 				logging.info(f"Computing mito and ribo for {sample}")
-				mito = np.where(npstr.startswith(ds.row_attrs["Gene"], "mt-"))[0]
-				ribo = np.where(npstr.startswith(ds.row_attrs["Gene"], "Rpl"))[0]
-				ribo = np.union1d(ribo, np.where(npstr.startswith(ds.row_attrs["Gene"], "Rps"))[0])
+				mito = np.where(npstr.startswith(ds.row_attrs["Gene"].astype("str"), "mt-"))[0]
+				ribo = np.where(npstr.startswith(ds.row_attrs["Gene"].astype("str"), "Rpl"))[0]
+				ribo = np.union1d(ribo, np.where(npstr.startswith(ds.row_attrs["Gene"].astype("str"), "Rps"))[0])
 				if len(ribo) > 0 and len(mito) > 0:
 					mitox = ds[mito, :]
 					ribox = ds[ribo, :]
