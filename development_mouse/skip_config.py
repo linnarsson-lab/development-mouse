@@ -3,4 +3,4 @@ import luigi
 
 
 class skip(luigi.Config):
-    classifier = luigi.BoolParameter(default=False)
+    classifier = luigi.BoolParameter(default=True)
