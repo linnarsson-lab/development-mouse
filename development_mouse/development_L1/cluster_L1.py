@@ -44,7 +44,7 @@ class ClusterL1(luigi.Task):
                             description="str, default=None\nThis specifies wich layers is used for manifold learning (i.e. the matrix used to compute PCA).Currently it only has effects when using `cytograph.ManifoldLearning` and not `cytograph.ManifoldLearning2`")
 
     def requires(self) -> luigi.Task:
-        return [dm.PrepareTissuePool(tissue=self.tissue), dm.MakeQualityClassifier(), dm.NameQualityClusters()]
+        return [dm.PrepareTissuePool(tissue=self.tissue), dm.NameQualityClusters()]  # dm.MakeQualityClassifier()
 
     def output(self) -> luigi.Target:
         """
