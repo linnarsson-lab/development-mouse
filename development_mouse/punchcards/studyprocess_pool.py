@@ -21,14 +21,14 @@ class StudyProcessPool(luigi.Task):
 	analysis = luigi.Parameter()
 
 	def requires(self) -> Iterator[luigi.Task]:
-		process_obj = cg.AnalysesParser()[self.analysis]
-		return cg.parse_project_requirements(process_obj)
+		punchcard_obj = cg.AnalysesParser()[self.analysis]
+		return cg.parse_project_requirements(punchcard_obj)
 
 	def output(self) -> luigi.Target:
 		return luigi.LocalTarget(os.path.join(dm.paths().build, "%s.loom" % (self.analysis,)))
 		
 	def run(self) -> None:
-		process_obj = cg.AnalysesParser()[self.analysis]
+		punchcard_obj = cg.AnalysesParser()[self.analysis]
 		logging.debug("Generating the pooled file %s.loom" % self.analysis)
 		with self.output().temporary_path() as out_file:
 			dsout = None  # type: loompy.LoomConnection
@@ -40,7 +40,7 @@ class StudyProcessPool(luigi.Task):
 				ds = loompy.connect(clustered.fn)
 				
 				# Select the tags as specified in the process file
-				filter_bool = cg.FilterManager(process_obj, ds, autoannotated.fn).compute_filter()
+				filter_bool = cg.FilterManager(punchcard_obj, ds, autoannotated.fn).compute_filter()
 
 				for (ix, selection, vals) in ds.batch_scan_layers(axis=1, batch_size=dm.memory().axis1):
 					# Filter the cells that belong to the selected tags

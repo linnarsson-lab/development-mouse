@@ -34,13 +34,15 @@ class AnalysisPool(luigi.Task):  # Status: check the filter manager
 			dsout: loompy.LoomConnection = None
 			# Try to drop the assumptio that 
 			# clustering and the autoannotation are the i
-			for clustered, autoannotated, *others in self.input():
-				logging.debug("Adding cells from the source file %s" % clustered.fn)
+			for input_dict in self.input():
+				clustered, autoannotated = input_dict["ClusterL1"], input_dict["ExportL1"]
+				logging.debug(f"Adding cells from the source file {clustered.fn}")
 				ds = loompy.connect(clustered.fn)
 				
 				# Select the tags as specified in the process file
 				filter_bool = cg.FilterManager(analysis_obj, ds, autoannotated.fn).compute_filter()
 
+				# NOTE: I don't know if the code below is updated
 				for (ix, selection, vals) in ds.batch_scan_layers(axis=1, batch_size=dm.memory().axis1):
 					# Filter the cells that belong to the selected tags
 					subset = np.intersect1d(np.where(filter_bool)[0], selection)

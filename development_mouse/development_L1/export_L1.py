@@ -27,10 +27,8 @@ class ExportL1(luigi.Task):
         `ClusterL1`:
             passing ``tissue``
         """
-        return [
-            dm.AggregateL1(tissue=self.tissue),
-            dm.ClusterL1(tissue=self.tissue)
-        ]
+        return {"AggregateL1": dm.AggregateL1(tissue=self.tissue),
+                "ClusterL1" dm.ClusterL1(tissue=self.tissue)}
 
     def output(self) -> luigi.Target:
         """
@@ -60,7 +58,7 @@ class ExportL1(luigi.Task):
         with self.output().temporary_path() as out_dir:
             if not os.path.exists(out_dir):
                 os.mkdir(out_dir)
-            dsagg = loompy.connect(self.input()[0].fn)
+            dsagg = loompy.connect(self.input()["AggregateL1"].fn)
             logging.info("Computing auto-annotation")
             aa = cg.AutoAnnotator(root=dm.paths().autoannotation)
             aa.annotate_loom(dsagg)
@@ -71,7 +69,7 @@ class ExportL1(luigi.Task):
             dsagg.export(os.path.join(out_dir, "L1_" + self.tissue + "_enrichment_q.tab"), layer="enrichment_q")
             dsagg.export(os.path.join(out_dir, "L1_" + self.tissue + "_trinaries.tab"), layer="trinaries")
 
-            ds = loompy.connect(self.input()[1].fn)
+            ds = loompy.connect(self.input()["ClusterL1"].fn)
 
             logging.info("Plotting manifold graph with auto-annotation")
             tags = list(dsagg.col_attrs["AutoAnnotation"])

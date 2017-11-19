@@ -71,14 +71,14 @@ class PunchcardParser(object):  # Status: needs to be run but looks ok
         return self._analyses_dict[key]
 
 
-def parse_analysis_requirements(process_obj: Dict) -> List[Tuple[luigi.Task]]:
+def parse_analysis_requirements(punchcard_obj: Dict) -> List[Tuple[luigi.Task]]:
     """
     This assume the requirements be always a TaskWrapper
     """
     requirements: List[luigi.WrapperTask] = []
-    for i in range(len(process_obj["parent_analyses"])):
-        parent_type = process_obj["parent_analyses"][i]["type"]
-        parent_kwargs = process_obj["parent_analyses"][i]["kwargs"]
+    for i in range(len(punchcard_obj["parent_analyses"])):
+        parent_type = punchcard_obj["parent_analyses"][i]["type"]
+        parent_kwargs = punchcard_obj["parent_analyses"][i]["kwargs"]
         if parent_type not in analysis_type_dict:
             raise NotImplementedError("type: %s not allowed, you need to allow it adding it to analysis_type_dict" % parent_type)
         Analysis = analysis_type_dict[parent_type]
@@ -89,7 +89,7 @@ def parse_analysis_requirements(process_obj: Dict) -> List[Tuple[luigi.Task]]:
     return requirements
 
 
-def parse_analysis_todo(process_obj: Dict) -> Iterator[luigi.Task]:
+def parse_analysis_todo(punchcard_obj: Dict) -> Iterator[luigi.Task]:
     """Yields luigi.Tasks after parsing out a dictionary describing the kind of tasks and their arguments
     """
     # the following safenames is implemented to make the eval statement secure
@@ -97,7 +97,7 @@ def parse_analysis_todo(process_obj: Dict) -> Iterator[luigi.Task]:
     for k, v in cg.__dict__.items():
         if type(v) == luigi.task_register.Register:
             safenames |= {k}
-    for analysis_entry in process_obj["todo_analyses"]:
+    for analysis_entry in punchcard_obj["todo_analyses"]:
         analysis_type, analysis_kwargs = analysis_entry["type"], analysis_entry["kwargs"]
         if analysis_type not in safenames:
             raise NotImplementedError("type: %s not allowed, becouse is not a valid luigi task" % analysis_type)
