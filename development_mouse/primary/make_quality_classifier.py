@@ -36,7 +36,7 @@ class MakeQualityClassifier(luigi.Task):
             logging.info("Get features to compute quality classifier")
 
             for input_obj in self.input():
-                logging.info("Get summary stats from {input_obj.fn}")
+                logging.info(f"Get summary stats from {input_obj.fn}")
                 ds = loompy.connect(input_obj.fn)
 
                 initial_cell_size = ds.col_attrs["SplicedTotal"]
