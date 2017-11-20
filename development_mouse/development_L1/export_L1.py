@@ -18,7 +18,7 @@ class ExportL1(luigi.Task):
     n_markers = luigi.IntParameter(default=10,
                                    description="number of markers visualized in the heatmap")
 
-    def requires(self) -> List[luigi.Task]:
+    def requires(self) -> Dict[str, luigi.Task]:
         """
         Arguments
         ---------
