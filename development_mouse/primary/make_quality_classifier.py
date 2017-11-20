@@ -123,7 +123,7 @@ class MakeQualityClassifier(luigi.Task):
 
             plt.figure(None, (15, 15))
             c = 0
-            for c in range(chosen_N):
+            for c in range(chosen_N + 1):
                 logging.info(f"Ploting QC_Class{c}_GMM.png")
                 gs = plt.GridSpec(X.shape[1], X.shape[1])
                 for i in range(X.shape[1]):
