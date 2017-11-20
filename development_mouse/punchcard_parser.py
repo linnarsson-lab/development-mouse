@@ -4,13 +4,12 @@ import os
 import luigi
 import cytograph as cg
 import development_mouse as dm
-from .luigi import Level1, PerformAnalysis, Level1Analysis
 import logging
 from collections import defaultdict
 import copy
 
 # those are the analyses allowed, if a kind of analysis is not here cannot be run using the analysis submodule
-analysis_type_dict = {"Level1": Level1, "PerformAnalysis": PerformAnalysis}
+analysis_type_dict = {"Level1": dm.Level1, "PerformAnalysis": dm.PerformAnalysis}
 
 
 class PunchcardParser(object):  # Status: needs to be run but looks ok
