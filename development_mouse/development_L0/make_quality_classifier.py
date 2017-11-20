@@ -29,14 +29,16 @@ class MakeQualityClassifier(luigi.Task):
             yield dm.PrepareTissuePool(tissue=tissue)
 
     def output(self) -> luigi.Target:
-        return luigi.LocalTarget(os.path.join(dm.paths().samples, "QC_classifier"))
+        return luigi.LocalTarget(os.path.join(dm.paths().build, "QC_classifier"))
 
     def run(self) -> None:
         with self.output().temporary_path() as path_name:
+            if not os.path.exists(path_name):
+                os.mkdir(path_name)
             logging.info("Get features to compute quality classifier")
 
             for input_obj in self.input():
-                logging.info("Get summary stats from {input_obj.fn}")
+                logging.info(f"Get summary stats from {input_obj.fn}")
                 ds = loompy.connect(input_obj.fn)
 
                 initial_cell_size = ds.col_attrs["SplicedTotal"]
@@ -99,16 +101,11 @@ class MakeQualityClassifier(luigi.Task):
             ix = np.random.choice(X.shape[0], size=min(100000, X.shape[0]), replace=False)
 
             logging.info("Ploting QC_Classes_GMM.png")
-            plt.figure(None, (14, 14))
+            plt.figure(None, (15, 15))
             gs = plt.GridSpec(X.shape[1], X.shape[1])
             for i in range(X.shape[1]):
                 for j in range(X.shape[1]):
-                    if i == 1 and j == 1:
-                        ax = plt.subplot(gs[i, j], adjustable='box', aspect=7.)
-                        cbar = mpl.colorbar.ColorbarBase(ax, cmap=plt.cm.tab20,
-                                                         norm=mpl.colors.Normalize(vmin=-0.01, vmax=np.max(labels) + 0.9))
-                        cbar.set_clim(0, 20)
-                    elif i <= j:
+                    if i <= j:
                         pass
                     else:
                         ax = plt.subplot(gs[i, j])
@@ -122,21 +119,16 @@ class MakeQualityClassifier(luigi.Task):
                                      color="k", fontdict={"size": 10},
                                      bbox=dict(facecolor='w', edgecolor='none', alpha=0.2))
             plt.tight_layout()
-            plt.savefig(os.path.join(path_name, "QC_Classes_GMM.png"))
+            plt.savefig(os.path.join(path_name, "QC_Classes_GMM.png"), dpi=300)
 
-            plt.figure(None, (14, 14))
+            plt.figure(None, (15, 15))
             c = 0
-            for c in range(chosen_N):
+            for c in range(chosen_N + 1):
                 logging.info(f"Ploting QC_Class{c}_GMM.png")
                 gs = plt.GridSpec(X.shape[1], X.shape[1])
                 for i in range(X.shape[1]):
                     for j in range(X.shape[1]):
-                        if i == 1 and j == 1:
-                            ax = plt.subplot(gs[i, j], adjustable='box', aspect=7.)
-                            cbar = mpl.colorbar.ColorbarBase(ax, cmap=plt.cm.tab20,
-                                                             norm=mpl.colors.Normalize(vmin=-0.01, vmax=np.max(labels) + 0.9))
-                            cbar.set_clim(0, 20)
-                        elif i <= j:
+                        if i <= j:
                             pass
                         else:
                             ax = plt.subplot(gs[i, j])
@@ -150,7 +142,7 @@ class MakeQualityClassifier(luigi.Task):
                                      bbox=dict(facecolor='w', edgecolor='none', alpha=0.2))
                                 
                 plt.tight_layout()
-                plt.savefig(os.path.join(path_name, "QC_Class{c}_GMM.png"))
+                plt.savefig(os.path.join(path_name, f"QC_Class{c}_GMM.png"), dpi=300)
 
             logging.info("Preparing (e.g. is training-less) the K Nearest Neighbors Classifier")
             knc = KNeighborsClassifier(n_neighbors=self.n_neighbors, n_jobs=10)
@@ -165,7 +157,7 @@ class MakeQualityClassifier(luigi.Task):
                         ax = plt.subplot(gs[i, j], adjustable='box', aspect=5.)
                         for c in range(np.max(labels) + 1):
                             plt.text(0.5, c / (np.max(labels) + 1), f"{c}".rjust(2),
-                                     color="k", fontdict={"size": 13},
+                                     color="k", fontdict={"size": 5 + (40 / np.max(labels))},
                                      bbox=dict(facecolor=plt.cm.tab20(c / 19), edgecolor='none'),
                                      transform=ax.transAxes)
                         plt.axis("off")
@@ -179,9 +171,13 @@ class MakeQualityClassifier(luigi.Task):
                         plt.ylabel(feats_name[i])
                         for c in range(np.max(labels) + 1):
                             plt.text(np.median(X_log[ix, j][predictions[ix] == c]), np.median(X_log[ix, i][predictions[ix] == c]), f"{c}",
-                                     color="k", fontdict={"size": 9})
+                                     color="k", fontdict={"size": 5})
             plt.tight_layout()
-            plt.savefig(os.path.join(path_name, "QC_Class_Predicitions.png"))
+            plt.savefig(os.path.join(path_name, "QC_Class_Predicitions.png"), dpi=300)
 
             logging.info("Pickling the classifier object")
             pickle.dump(knc, open(os.path.join(path_name, "QC_Classifier.pickle"), "wb"))
+
+        f = open(os.path.join(dm.paths().build, "QC_classifier", "names_qc_clusters.form.txt"), "w")
+        f.write('\n'.join([f"{i:02}:" for i in range(np.max(labels) + 1)]))
+        f.close()
