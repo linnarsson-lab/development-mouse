@@ -60,7 +60,6 @@ class ExportL1(luigi.Task):
                 os.mkdir(out_dir)
             dsagg = loompy.connect(self.input()[f"AggregateL1(tissue={self.tissue})"].fn)
 
-
             dsagg.export(os.path.join(out_dir, "L1_" + self.tissue + "_expression.tab"))
             dsagg.export(os.path.join(out_dir, "L1_" + self.tissue + "_enrichment.tab"), layer="enrichment")
             dsagg.export(os.path.join(out_dir, "L1_" + self.tissue + "_enrichment_q.tab"), layer="enrichment_q")
@@ -71,6 +70,7 @@ class ExportL1(luigi.Task):
             logging.info("Plotting manifold graph with auto-annotation")
             tags = list(dsagg.col_attrs["AutoAnnotation"])
             cg.plot_graph(ds, os.path.join(out_dir, "L1_" + self.tissue + "_manifold.aa.png"), tags)
+            cg.plot_graph_age(ds, os.path.join(out_dir, "L1_" + self.tissue + "_manifold.age.png"), tags)
 
             logging.info("Plotting manifold graph with auto-auto-annotation")
             tags = list(dsagg.col_attrs["MarkerGenes"])
@@ -78,3 +78,6 @@ class ExportL1(luigi.Task):
 
             logging.info("Plotting marker heatmap")
             cg.plot_markerheatmap(ds, dsagg, n_markers_per_cluster=self.n_markers, out_file=os.path.join(out_dir, "L1_" + self.tissue + "_heatmap.pdf"))
+
+
+            

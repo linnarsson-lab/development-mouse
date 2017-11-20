@@ -50,7 +50,7 @@ class AggregateL1(luigi.Task):
 		return dm.ClusterL1(tissue=self.tissue)
 
 	def output(self) -> luigi.Target:
-		return luigi.LocalTarget(os.path.join(dm.paths().build, "L1_" + self.tissue + ".agg.loom"))
+		return luigi.LocalTarget(os.path.join(dm.paths().build, f"L1_{self.tissue}.agg.loom"))
 
 	def run(self) -> None:
 		logging = cg.logging(self)

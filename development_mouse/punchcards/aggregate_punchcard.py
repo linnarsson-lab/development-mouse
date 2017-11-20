@@ -25,7 +25,7 @@ class AggregatePunchcard(luigi.Task):  # Status: Ok
 		return dm.PunchcardPool(card=self.card)
 
 	def output(self) -> luigi.Target:
-		return luigi.LocalTarget(os.path.join(dm.paths().build, f"{self.analysis}.agg.loom"))
+		return luigi.LocalTarget(os.path.join(dm.paths().build, f"{self.card}.agg.loom"))
 
 	def run(self) -> None:
 		logging = cg.logging(self)

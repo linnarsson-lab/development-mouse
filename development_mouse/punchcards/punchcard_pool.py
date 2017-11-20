@@ -27,7 +27,7 @@ class PunchcardPool(luigi.Task):  # Status: check the filter manager
 		return dm.parse_punchcard_require(punchcard_obj)
 
 	def output(self) -> luigi.Target:
-		return luigi.LocalTarget(os.path.join(dm.paths().build, f"{self.card}.loom"))
+		return luigi.LocalTarget(os.path.join(dm.paths().build, f"Pool_{self.card}.loom"))
 		
 	def run(self) -> None:
 		analysis_obj = cg.AnalysesParser()[self.card]
