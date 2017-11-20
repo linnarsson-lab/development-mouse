@@ -13,6 +13,7 @@ import numpy_groupies.aggregate_numpy as npg
 import scipy.cluster.hierarchy as hc
 
 
+# NOTE: This should be changed to be ExtractL1 like
 class AggregateAnalysis(luigi.Task):  # Status: Ok
 	"""
 	Aggregate all clusters in a new Loom file

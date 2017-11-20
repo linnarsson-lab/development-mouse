@@ -9,7 +9,7 @@ from collections import defaultdict
 import copy
 
 # those are the analyses allowed, if a kind of analysis is not here cannot be run using the analysis submodule
-analysis_type_dict = {"Level1": dm.Level1, "PerformAnalysis": dm.PerformAnalysis}
+require_type_dict = {"Level1": dm.Level1, "PerformAnalysis": dm.PerformAnalysis}
 
 
 class PunchcardParser(object):  # Status: needs to be run but looks ok
@@ -70,40 +70,39 @@ class PunchcardParser(object):  # Status: needs to be run but looks ok
         return self._analyses_dict[key]
 
 
-def parse_analysis_requirements(punchcard_obj: Dict) -> List[Tuple[luigi.Task]]:
-    """
-    This assume the requirements be always a TaskWrapper
+def parse_punchcard_require(punchcard_obj: Dict) -> List[Tuple[luigi.Task]]:
+    """Takes a dictionary parsed from the yaml file and returns the correspnding list of Tasks requirement
+
+    The current version assumes that the input wil always be a WrapperTask
     """
     requirements: List[luigi.WrapperTask] = []
-    for i in range(len(punchcard_obj["parent_analyses"])):
-        parent_type = punchcard_obj["parent_analyses"][i]["type"]
-        parent_kwargs = punchcard_obj["parent_analyses"][i]["kwargs"]
-        if parent_type not in analysis_type_dict:
-            raise NotImplementedError("type: %s not allowed, you need to allow it adding it to analysis_type_dict" % parent_type)
-        Analysis = analysis_type_dict[parent_type]
-        if parent_kwargs == {}:  # maybe there is no need of this if statement
-            requirements += list(Analysis().requires())  # Requires returns an Iterator
-        else:
-            requirements += list(Analysis(**parent_kwargs).requires())
+    for i in range(len(punchcard_obj["require"])):
+        requirement_entry = punchcard_obj["require"][i]
+        requirement_type = requirement_entry["type"]
+        requirement_kwargs = requirement_entry["kwargs"]
+        if requirement_type not in require_type_dict:
+            raise NotImplementedError(f"Task type: {requirement_type} not allowed, you need to allow it adding it to require_type_dict")
+        Task = require_type_dict[requirement_type]
+        requirements += list(Task(**requirement_kwargs).requires())
     return requirements
 
 
-def parse_analysis_todo(punchcard_obj: Dict) -> Iterator[luigi.Task]:
+def parse_punchcard_run(punchcard_obj: Dict) -> Iterator[luigi.Task]:
     """Yields luigi.Tasks after parsing out a dictionary describing the kind of tasks and their arguments
     """
-    # the following safenames is implemented to make the eval statement secure
+    # the following safenames is implemented to make the gettattr statement secure
     safenames = set()  # type: set
-    for k, v in cg.__dict__.items():
+    for k, v in dm.__dict__.items():
         if type(v) == luigi.task_register.Register:
             safenames |= {k}
-    for analysis_entry in punchcard_obj["todo_analyses"]:
-        analysis_type, analysis_kwargs = analysis_entry["type"], analysis_entry["kwargs"]
-        if analysis_type not in safenames:
-            raise NotImplementedError("type: %s not allowed, becouse is not a valid luigi task" % analysis_type)
+    for task2run in punchcard_obj["run"]:
+        task_type, task_kwargs = task2run["type"], task2run["kwargs"]
+        if task_type not in safenames:
+            raise NotImplementedError(f"Task type: {task_type} not allowed, becouse is not a valid luigi task")
         else:
-            Analysis_class = getattr(cg, analysis_type)  # eval("cg.%s" % analysis_type)
+            Task_class = getattr(dm, task_type)  # eval("cg.%s" % analysis_type)
 
-            def Analysis(analysis: Any) -> luigi.Task:
-                return Analysis_class(analysis, **analysis_kwargs)
+            def Task(analysis: Any) -> luigi.Task:
+                return Task_class(analysis, **task_kwargs)
             
-            yield Analysis
+            yield Task

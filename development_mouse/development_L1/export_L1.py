@@ -10,7 +10,7 @@ import luigi
 
 
 class ExportL1(luigi.Task):
-    """Luigi Task to export summary files
+    """Luigi Task to autoannotate and export summary files
     """
     tissue = luigi.Parameter(description="name of the tissue from tool specification file.",
                              always_in_help=True)
@@ -27,8 +27,8 @@ class ExportL1(luigi.Task):
         `ClusterL1`:
             passing ``tissue``
         """
-        return {"AggregateL1": dm.AggregateL1(tissue=self.tissue),
-                "ClusterL1": dm.ClusterL1(tissue=self.tissue)}
+        return {f"AggregateL1(tissue={self.tissue})": dm.AggregateL1(tissue=self.tissue),
+                f"ClusterL1(tissue={self.tissue})": dm.ClusterL1(tissue=self.tissue)}
 
     def output(self) -> luigi.Target:
         """
@@ -58,11 +58,8 @@ class ExportL1(luigi.Task):
         with self.output().temporary_path() as out_dir:
             if not os.path.exists(out_dir):
                 os.mkdir(out_dir)
-            dsagg = loompy.connect(self.input()["AggregateL1"].fn)
-            logging.info("Computing auto-annotation")
-            aa = cg.AutoAnnotator(root=dm.paths().autoannotation)
-            aa.annotate_loom(dsagg)
-            aa.save_in_loom(dsagg)
+            dsagg = loompy.connect(self.input()[f"AggregateL1(tissue={self.tissue})"].fn)
+
 
             dsagg.export(os.path.join(out_dir, "L1_" + self.tissue + "_expression.tab"))
             dsagg.export(os.path.join(out_dir, "L1_" + self.tissue + "_enrichment.tab"), layer="enrichment")

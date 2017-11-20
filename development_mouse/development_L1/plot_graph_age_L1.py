@@ -10,6 +10,7 @@ import development_mouse as dm
 import luigi
 
 
+# NOTE Not sure is working
 class PlotGraphAgeL1(luigi.Task):
 	"""
 	Luigi Task to plot the MKNN graph, level 2
@@ -20,7 +21,7 @@ class PlotGraphAgeL1(luigi.Task):
 		return [dm.PrepareTissuePool(tissue=self.tissue), dm.AutoAnnotateL1(tissue=self.tissue)]
 
 	def output(self) -> luigi.Target:
-		return luigi.LocalTarget(os.path.join(dm.paths().build, "L1_" + self.tissue + ".age.png"))
+		return luigi.LocalTarget(os.path.join(dm.paths().build, f"L1_{self.tissue}.age.png"))
 
 	def run(self) -> None:
 		logging.info("Plotting MKNN graph age")

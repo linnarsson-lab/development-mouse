@@ -11,7 +11,7 @@ import luigi
 from collections import defaultdict
 
 
-class AnalysisPool(luigi.Task):  # Status: check the filter manager
+class PunchcardPool(luigi.Task):  # Status: check the filter manager
 	"""
 	Luigi Task to generate a particular slice of the data as specified by a punchcard
 
@@ -21,8 +21,10 @@ class AnalysisPool(luigi.Task):  # Status: check the filter manager
 	card = luigi.Parameter()
 
 	def requires(self) -> Iterator[luigi.Task]:
+		"""Parses the files in punchcard folder and returns required Tasks
+		"""
 		punchcard_obj = dm.PunchcardParser()[self.card]
-		return dm.parse_punchcard_requirements(punchcard_obj)
+		return dm.parse_punchcard_require(punchcard_obj)
 
 	def output(self) -> luigi.Target:
 		return luigi.LocalTarget(os.path.join(dm.paths().build, f"{self.card}.loom"))
@@ -32,7 +34,7 @@ class AnalysisPool(luigi.Task):  # Status: check the filter manager
 		logging.debug(f"Generating the pooled file {self.card}.loom")
 		with self.output().temporary_path() as out_file:
 			dsout: loompy.LoomConnection = None
-			# Try to drop the assumptio that 
+			# Try to drop the assumptio that
 			# clustering and the autoannotation are the i
 			for input_dict in self.input():
 				clustered, autoannotated = input_dict["ClusterL1"], input_dict["ExportL1"]

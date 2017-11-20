@@ -10,12 +10,7 @@ import luigi
 
 
 class Level1(luigi.WrapperTask):
-    """
-    Luigi Task to run a subset of level 1 Analysis
-
-    NOTE !!!!!
-    Level1, for now, is Development only! Not the same as Level1Analysis!
-
+    """Luigi Task to run a subset of level 1 Analysis
     """
 
     project = luigi.Parameter(default="Development")
@@ -26,4 +21,4 @@ class Level1(luigi.WrapperTask):
         tissues = cg.targets_map[self.target]
         for tissue in tissues:
             if cg.time_check(tissue, self.time):
-                yield dm.ExportL1(tissue=tissue)  # this breaks all the the processes pipeline
+                yield dm.ExportL1(tissue=tissue)  # NOTE this breaks all the the processes pipeline
