@@ -178,6 +178,6 @@ class MakeQualityClassifier(luigi.Task):
             logging.info("Pickling the classifier object")
             pickle.dump(knc, open(os.path.join(path_name, "QC_Classifier.pickle"), "wb"))
 
-        f = open(os.path.join(path_name, "names_qc_clusters.form.txt"), "w")
+        f = open(os.path.join(dm.paths().build, "QC_classifier", "names_qc_clusters.form.txt"), "w")
         f.write('\n'.join([f"{i:02}:" for i in range(np.max(labels) + 1)]))
         f.close()
