@@ -28,7 +28,7 @@ class ExportL1(luigi.Task):
             passing ``tissue``
         """
         return {"AggregateL1": dm.AggregateL1(tissue=self.tissue),
-                "ClusterL1" dm.ClusterL1(tissue=self.tissue)}
+                "ClusterL1": dm.ClusterL1(tissue=self.tissue)}
 
     def output(self) -> luigi.Target:
         """
