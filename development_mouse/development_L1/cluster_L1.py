@@ -81,7 +81,7 @@ class ClusterL1(luigi.Task):
             logging.info("Deserializing QC Classifier")
             knc: KNeighborsClassifier = pickle.load(open(os.path.join(self.input()["MakeQualityClassifier"].fn, "QC_Classifier.pickle"), "rb"))
             logging.info("Reading NameQualityCluster file")
-            cluster_mapping = {int(i.split(":")[0]): i.split(":")[1] for i in open(self.input[1].fn).read().rstrip().split()}
+            cluster_mapping = {int(i.split(":")[0]): i.split(":")[1] for i in open(self.input["NameQualityClusters"].fn).read().rstrip().split()}
             initial_cell_size = ds.col_attrs["SplicedTotal"]
             initial_Ucell_size = ds.col_attrs["UnsplicedTotal"]
             detected_genes = ds.col_attrs["TotalMolNoAmbiguous"]
