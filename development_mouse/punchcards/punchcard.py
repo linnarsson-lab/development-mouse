@@ -25,5 +25,5 @@ class Punchcard(luigi.WrapperTask):  # Status: check what it should return
 		# To make it more general we can avoid to have ExportPunchcard as the first instance
 		other_tasks = []
 		for task in cg.parse_analysis_todo(punchcard_obj):
-			other_tasks.append(task(analysis=self.card))
-		return [dm.ExportAnalysis(analysis=self.card), *other_tasks]  # Not sure why but before t was [[]]
+			other_tasks.append(task(card=self.card))
+		return [dm.ExportAnalysis(card=self.card), *other_tasks]  # Not sure why but before t was [[]]
