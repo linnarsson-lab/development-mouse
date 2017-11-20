@@ -25,8 +25,8 @@ class EstimateVelocityPunchcard(luigi.Task):
             passing ``card``
         """
         # NOTE: not sure it needs AggregateL1
-        return [dm.ClusterL1(card=self.card),
-                dm.AggregateL1(card=self.card)]
+        return [dm.ClusterPunchcard(card=self.card),
+                dm.AggregatePunchcard(card=self.card)]
 
     def output(self) -> luigi.Target:
         """

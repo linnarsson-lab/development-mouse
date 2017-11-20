@@ -14,27 +14,26 @@ import luigi
 class VisualizeVelocityPunchcard(luigi.Task):
     """Luigi Task to run velocyto
     """
-    tissue = luigi.Parameter(description="name of the tissue from tool specification file.",
-                             always_in_help=True)
+    card = luigi.Parameter()
 
     def requires(self) -> List[luigi.Task]:
         """
         Arguments
         ---------
         `EstimateVelocity`:
-            passing ``tissue``
+            passing ``card``
         """
         # NOTE: not sure it needs AggregateL1
-        return dm.EstimateVelocity(tissue=self.tissue)
+        return dm.EstimateVelocityPunchcard(card=self.card)
 
     def output(self) -> luigi.Target:
         """
         Returns
         -------
-        folder: ``velocity_[TISSUE]_export``:
+        folder: ``velocity_[card]_export``:
             Note this is kind of a hack to luigi, single files will not be regenerated but whole folder will.
         """
-        return luigi.LocalTarget(os.path.join(dm.paths().build, f"velocity_{self.tissue}_export"))
+        return luigi.LocalTarget(os.path.join(dm.paths().build, f"velocity_{self.card}_export"))
 
     def run(self) -> None:
         """Run ``estimate_transition_prob`` and output the result as a png
@@ -59,7 +58,7 @@ class VisualizeVelocityPunchcard(luigi.Task):
             logging.info("Serializing the vlm object. This might take long time and generate huge file on disk.")
             
             # NOTE: IMPORTANT here I actually modify a luigi Target, this is not considered good practice
-            # Dump to a temp and only substitute the original file, atomically just before the folder velocity_[TISSUE]_export get created
+            # Dump to a temp and only substitute the original file, atomically just before the folder velocity_[card]_export get created
             tmp_file = tempfile.mktemp(dir=os.path.join(dm.paths().build))
             # I get if I leave the default dir: OSError: [Errno 18] Invalid cross-device link: '/tmp/tmphnvw5x6_' -> '/data/proj/development/build_20171115/velocity_Forebrain_E9-11.hdf5'
             vlm.to_hdf5(tmp_file)
@@ -73,5 +72,5 @@ class VisualizeVelocityPunchcard(luigi.Task):
                                  min_mass=10, angles='xy', scale_units='xy',
                                  headaxislength=2.75, headlength=5, headwidth=4.8, quiver_scale=0.25)
             # NOTE: this parameters could be tuned. In particular min_mass!
-            plt.savefig(os.path.join(out_dir, "velocity_" + self.tissue + "_TSNE.png"))
-            os.rename(tmp_file, os.path.join(dm.paths().build, f"velocity_{self.tissue}.hdf5"))  # Atomic substitution of a previous file
+            plt.savefig(os.path.join(out_dir, f"velocity_{self.card}_TSNE.png"))
+            os.rename(tmp_file, os.path.join(dm.paths().build, f"velocity_{self.card}.hdf5"))  # Atomic substitution of a previous file
