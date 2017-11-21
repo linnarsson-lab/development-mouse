@@ -30,7 +30,7 @@ class PunchcardPool(luigi.Task):  # Status: check the filter manager
 		return luigi.LocalTarget(os.path.join(dm.paths().build, f"Pool_{self.card}.loom"))
 		
 	def run(self) -> None:
-		analysis_obj = cg.AnalysesParser()[self.card]
+		analysis_obj = dm.PunchcardParser()[self.card]
 		logging.debug(f"Generating the pooled file {self.card}.loom")
 		with self.output().temporary_path() as out_file:
 			dsout: loompy.LoomConnection = None
