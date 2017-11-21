@@ -33,8 +33,10 @@ class PunchcardParser(object):  # Status: needs to be run but looks ok
     def _load_defs(self) -> None:
         debug_msgs = defaultdict(list)  # type: dict
         for cur, dirs, files in os.walk(self.root):
+            if any(i in cur.split("/") for i in ["ignore", "exclude", "old", ".git"]):
+                continue
             for file in files:
-                if ((".yaml" in file) or (".yml" in file)) and ("Model.yaml" not in file):
+                if ((".yaml" == file[-5:]) or (".yml" == file[-4:])) and ("Model.yaml" not in file):
                     temp_dict = yaml.load(open(os.path.join(self.root, file)))
                     name = temp_dict["abbreviation"]
                     model_copy = copy.deepcopy(self.model)
