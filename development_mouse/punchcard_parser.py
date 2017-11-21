@@ -8,8 +8,14 @@ import logging
 from collections import defaultdict
 import copy
 
-# those are the analyses allowed, if a kind of analysis is not here cannot be run using the analysis submodule
-require_type_dict = {"Level1": dm.Level1, "PerformAnalysis": dm.PerformAnalysis}
+# those are the analyses allowed, if a kind of analysis is not here cannot be run using the punchcard submodule
+require_type_dict = {"AggregatePunchcard": dm.AggregatePunchcard,
+                     "ClusterPunchcard": dm.ClusterPunchcard,
+                     "ExportPunchcard": dm.ExportPunchcard,
+                     "PunchcardPool": dm.PunchcardPool,
+                     "DiagnosticVelocityPunchcard": dm.DiagnosticVelocityPunchcard,
+                     "AggregatePunchcard": dm.EstimateVelocityPunchcard,
+                     "VisualizeVelocityPunchcard": dm.VisualizeVelocityPunchcard}
 
 
 class PunchcardParser(object):  # Status: needs to be run but looks ok
