@@ -29,7 +29,7 @@ class ClusterPunchcard(luigi.Task):  # Status: OK
     layer = luigi.Parameter(default=None, description="Layer used for manifold learning (i.e. the matrix used to compute PCA).Currently it only has effects when using `cytograph.ManifoldLearning` and not `cytograph.ManifoldLearning2`")
 
     def requires(self) -> luigi.Task:
-        return cg.PunchcardPool(card=self.card)
+        return dm.PunchcardPool(card=self.card)
 
     def output(self) -> luigi.Target:
         return luigi.LocalTarget(os.path.join(dm.paths().build, f"{self.card}.loom"))
