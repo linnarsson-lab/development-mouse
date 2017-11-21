@@ -18,7 +18,7 @@ class Level1(luigi.WrapperTask):
     time = luigi.Parameter(default="E7-E18")  # later more specific autoannotation can be devised
 
     def requires(self) -> Iterator[luigi.Task]:
-        tissues = cg.targets_map[self.target]
+        tissues = dm.targets_map[self.target]
         for tissue in tissues:
             if cg.time_check(tissue, self.time):
                 yield dm.ExportL1(tissue=tissue)  # NOTE this breaks all the the processes pipeline
