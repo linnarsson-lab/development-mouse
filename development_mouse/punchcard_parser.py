@@ -15,7 +15,8 @@ require_type_dict = {"AggregatePunchcard": dm.AggregatePunchcard,
                      "PunchcardPool": dm.PunchcardPool,
                      "DiagnosticVelocityPunchcard": dm.DiagnosticVelocityPunchcard,
                      "AggregatePunchcard": dm.EstimateVelocityPunchcard,
-                     "VisualizeVelocityPunchcard": dm.VisualizeVelocityPunchcard}
+                     "VisualizeVelocityPunchcard": dm.VisualizeVelocityPunchcard,
+                     "Level1": dm.Level1}
 
 
 class PunchcardParser(object):  # Status: needs to be run but looks ok
