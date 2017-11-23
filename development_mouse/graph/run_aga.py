@@ -21,7 +21,7 @@ class RunAGA(luigi.Task):
 
     def run(self) -> None:
         #add logging?
-        with self.output().temporary_path()[:-3] as out_file:
+        with self.output().temporary_path() as out_file:
             ds = loompy.connect(self.input())
             adata = sc.AnnData(np.transpose(ds[:, :]))
             adata.smp['Clusters'] = ds.col_attrs['Clusters'].astype('str')
@@ -30,4 +30,4 @@ class RunAGA(luigi.Task):
             sc.tl.tsne(adata, n_jobs=16)
             ax = sc.pl.tsne(adata, color='Clusters')  # bug? why need to plot for tl.aga?
             sc.tl.aga(adata, node_groups='Clusters', n_jobs=16)
-            sc.write(out_file, adata, ext='h5')
+            sc.write(out_file[:-3], adata, ext='h5')
