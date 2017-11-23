@@ -77,7 +77,7 @@ class ClusterL1(luigi.Task):
             dsout: loompy.LoomConnection = None
 
             logging.info("Deserializing QC Classifier")
-            knc: KNeighborsClassifier = pickle.load(open(self.input()[2].fn, "rb"))
+            knc: KNeighborsClassifier = pickle.load(open(self.input()[1].fn, "rb"))
             logging.info("Reading NameQualityCluster file")
             cluster_mapping = {int(i.split(":")[0]): i.split(":")[1] for i in open(self.input[1].fn).read().rstrip().split()}
             initial_cell_size = ds.col_attrs["SplicedTotal"]
