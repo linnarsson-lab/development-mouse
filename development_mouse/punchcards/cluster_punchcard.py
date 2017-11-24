@@ -2,93 +2,43 @@ from typing import *
 import os
 from shutil import copyfile
 import numpy as np
+import logging
 import luigi
-import gc
 import cytograph as cg
 import development_mouse as dm
 import loompy
 import logging
+from sklearn.neighbors import KNeighborsClassifier
 import pickle
-from scipy import sparse
-from scipy.special import polygamma
-from sklearn.cluster import AgglomerativeClustering, KMeans, Birch
-from sklearn.decomposition import PCA, IncrementalPCA, FastICA
-from sklearn.manifold import TSNE
-from sklearn.metrics import pairwise_distances
-from sklearn.metrics.pairwise import pairwise_distances
-from sklearn.neighbors import BallTree, NearestNeighbors, kneighbors_graph, KNeighborsClassifier
-from sklearn.preprocessing import scale
-from sklearn.svm import SVR
-from scipy.stats import ks_2samp
 import networkx as nx
 import hdbscan
+import gc
 from sklearn.cluster import DBSCAN
 
 
-class ClusterL1(luigi.Task):
-    """Level 1 Clustering
+class ClusterPunchcard(luigi.Task):  # Status: OK
     """
-
-    tissue = luigi.Parameter(description="Name of the tissue from tool specification file")
+    Clustering for a Punchcard pool
+    """
+    card = luigi.Parameter(description="Name of the punchcard to use")
     n_genes = luigi.IntParameter(default=1000, description="""(default=1000) The number of genes used in manifold learning""")
-    manifold_learning = luigi.IntParameter(default=1, description="(default=1) Whether to use `cytograph.ManifoldLearning` or `cytograph.ManifoldLearning2`")
+    manifold_learning = luigi.IntParameter(default=1, description="int, default=1\nWhether to use `cytograph.ManifoldLearning` or `cytograph.ManifoldLearning2`")
     gtsne = luigi.BoolParameter(default=True, description="(default=True) Use graph t-SNE for layout")
     alpha = luigi.FloatParameter(default=1, description="(default=1) The scale parameter for multiscale KNN")
-    filter_geneset = luigi.Parameter(default=None, description="(path) The path of a file containing as rows the gene symbol of genes to excluded (Note: despite the name it can be used for any gene set)")
-    layer = luigi.Parameter(default=None, description="Layer used for manifold learning (i.e. the matrix used to compute PCA). Currently it only has effects when using `cytograph.ManifoldLearning` and not `cytograph.ManifoldLearning2`")
+    filter_geneset = luigi.Parameter(default=None, description="The path of a file containing as rows the gene symbol of genes to excluded (Note: despite the name it can be used for any gene set)")
+    layer = luigi.Parameter(default=None, description="Layer used for manifold learning (i.e. the matrix used to compute PCA).Currently it only has effects when using `cytograph.ManifoldLearning` and not `cytograph.ManifoldLearning2`")
 
     def requires(self) -> luigi.Task:
-        return {"PrepareTissuePool": dm.PrepareTissuePool(tissue=self.tissue),
-                "NameQualityClusters": dm.NameQualityClusters(),
-                "MakeQualityClassifier": dm.MakeQualityClassifier()}
+        return dm.PunchcardPool(card=self.card)
 
     def output(self) -> luigi.Target:
-        """
-        Returns
-        -------
-        file: ``L1_[TISSUE].loom``
-
-        Reads the output of `PrepareTissuePool` and does:
-            - runs the `cytograph.batch_scan_layers` to remove cells that are not valid (almost creating a copy)
-            - runs `cytograph.ManifoldLearning` or `cytograph.ManifoldLearning2`
-            - runs `cytograph.Clustering` on the learned mainfild
-            - if `cytograph.ManifoldLearning2` also runs `cytograph.Merger`
-        """
-        return luigi.LocalTarget(os.path.join(dm.paths().build, "L1_" + self.tissue + ".loom"))
+        return luigi.LocalTarget(os.path.join(dm.paths().build, f"{self.card}.loom"))
 
     def run(self) -> None:
-        """
-        Other Parameters
-        ----------------
-        cluster_method: `cluster_config.cluster.method`, default="dbscan"
-            Select the method for clustering. Valid: "hdbscan", "dbscan", "multilev", "wmultilev", "mknn_louvain", "louvain" (same as None)
-        cluster_no_outliers: `cluster_config.cluster.no_outliers`, default=False
-            Whether to consider in the clustering cells that have been marked as outliers in `PrepareTissuePool`
-        memory_batch: `memory_config.memory.batch`, default=2000
-            The size of the batches that are used by `cytograph.batch_scan_layers`
-        """
         logging = cg.logging(self)
         with self.output().temporary_path() as out_file:
-            ds = loompy.connect(self.input()["PrepareTissuePool"].fn)
+            ds = loompy.connect(self.input().fn)
             dsout: loompy.LoomConnection = None
-
-            logging.info("Deserializing QC Classifier")
-            knc: KNeighborsClassifier = pickle.load(open(os.path.join(self.input()["MakeQualityClassifier"].fn, "QC_Classifier.pickle"), "rb"))
-            logging.info("Reading NameQualityCluster file")
-            cluster_mapping = {int(i.split(":")[0]): i.split(":")[1] for i in open(self.input()["NameQualityClusters"].fn).read().rstrip().split()}
-            initial_cell_size = ds.col_attrs["SplicedTotal"]
-            initial_Ucell_size = ds.col_attrs["UnsplicedTotal"]
-            detected_genes = ds.col_attrs["TotalMolNoAmbiguous"]
-            mito_size = ds.col_attrs["MitocondrialTotal"]
-            ribo_size = ds.col_attrs["RibosomalTotal"]
-            X = np.column_stack((initial_cell_size, initial_Ucell_size, detected_genes, mito_size, ribo_size))
-
-            logging.info("Using the QC Classifier to set QualityClass")
-            predicted = knc.predict(X)
-            qc_luster_labels = np.array([cluster_mapping[i] for i in predicted])
-            ds.set_attr(name="QualityClass", values=qc_luster_labels, axis=1)
-
-            # NOTE for now the quality class is only written and not used anywhere
 
             logging.info("Removing invalid cells")
             for (ix, selection, vals) in ds.batch_scan_layers(cells=np.where(ds.col_attrs["_Valid"] == 1)[0], layers=ds.layer.keys(), batch_size=dm.memory().axis1, axis=1):

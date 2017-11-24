@@ -13,21 +13,22 @@ import numpy_groupies.aggregate_numpy as npg
 import scipy.cluster.hierarchy as hc
 
 
-class AggregateAnalysis(luigi.Task):  # Status: Ok
+class AggregatePunchcard(luigi.Task):  # Status: Ok
 	"""
-	Aggregate all clusters in a new Loom file
+	Summary statistics of all clusters in a new Loom file
 	"""
-	analysis = luigi.Parameter()
-	n_markers = luigi.IntParameter(default=10)
-	n_auto_genes = luigi.IntParameter(default=6)
+	card = luigi.Parameter(description="Name of the punchcard")
+	n_markers = luigi.IntParameter(default=10, description="Number of markers considered by the Aggergator")
+	n_auto_genes = luigi.IntParameter(default=6, description="Number of genes to use in the AutoAutoannotation")
 
 	def requires(self) -> List[luigi.Task]:
-		return dm.ClusterAnalysis(analysis=self.analysis)
+		return dm.PunchcardPool(card=self.card)
 
 	def output(self) -> luigi.Target:
-		return luigi.LocalTarget(os.path.join(dm.paths().build, "Analysis_" + self.analysis + ".agg.loom"))
+		return luigi.LocalTarget(os.path.join(dm.paths().build, f"{self.card}.agg.loom"))
 
 	def run(self) -> None:
+		logging = cg.logging(self)
 		with self.output().temporary_path() as out_file:
 			ds = loompy.connect(self.input().fn)
 			cg.Aggregator(self.n_markers).aggregate(ds, out_file)

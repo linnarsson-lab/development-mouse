@@ -12,7 +12,6 @@ import numpy_groupies.aggregate_numpy as npg
 import scipy.cluster.hierarchy as hc
 
 
-
 class AggregateL1(luigi.Task):
 	"""
 	Aggregate all clusters in a new Loom file
@@ -22,7 +21,7 @@ class AggregateL1(luigi.Task):
 	tissue: str
 		name of the tissue from tool specification file
 	n_markers: int, default=10
-		the number of markers per cluster in the marker heatmap 
+		the number of markers per cluster in the marker heatmap
 	n_auto_genes: int, default=6
 		number of genes to include in the auto-auto-annotation
 
@@ -51,7 +50,7 @@ class AggregateL1(luigi.Task):
 		return dm.ClusterL1(tissue=self.tissue)
 
 	def output(self) -> luigi.Target:
-		return luigi.LocalTarget(os.path.join(dm.paths().build, "L1_" + self.tissue + ".agg.loom"))
+		return luigi.LocalTarget(os.path.join(dm.paths().build, f"L1_{self.tissue}.agg.loom"))
 
 	def run(self) -> None:
 		logging = cg.logging(self)
