@@ -65,7 +65,7 @@ class ExportL1(luigi.Task):
             dsagg.export(os.path.join(out_dir, "L1_" + self.tissue + "_enrichment_q.tab"), layer="enrichment_q")
             dsagg.export(os.path.join(out_dir, "L1_" + self.tissue + "_trinaries.tab"), layer="trinaries")
 
-            ds = loompy.connect(self.input()["ClusterL1"].fn)
+            ds = loompy.connect(self.input()[f"ClusterL1(tissue={self.tissue})"].fn)
 
             logging.info("Plotting manifold graph with auto-annotation")
             tags = list(dsagg.col_attrs["AutoAnnotation"])
