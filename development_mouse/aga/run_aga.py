@@ -21,7 +21,6 @@ class RunAGA(luigi.Task):
         return luigi.LocalTarget(os.path.join(dm.paths().build, f"graph_{self.tissue}.h5"))
 
     def run(self) -> None:
-        #add logging?
         with self.output().temporary_path() as out_file:
             ds = loompy.connect(self.input().fn)
             adata = sc.AnnData(np.transpose(ds[:, :]))

@@ -20,7 +20,6 @@ class PlotAGA(luigi.Task):
         return luigi.LocalTarget(os.path.join(dm.paths().build, f"AGA_{self.tissue}_graph.png"))
 
     def run(self) -> None:
-        # add logging?
         with self.output().temporary_path() as out_file:
             adata = sc.read(self.input().fn)
             print('outfile:', self.input().fn)            
