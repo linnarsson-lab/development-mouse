@@ -29,12 +29,13 @@ class RunAGA(luigi.Task):
             adata = sc.AnnData(np.transpose(ds[:, :]))
             adata.smp['Clusters'] = ds.col_attrs['Clusters'].astype('str')
             adata.var_names = ds.row_attrs['Gene']
+            logging.info("Filtering and t-SNE") 
             sc.pp.recipe_zheng17(adata, plot=True)  # replace with custom filtering?
             sc.tl.tsne(adata, n_jobs=16)
-            ax = sc.pl.tsne(adata, color='Clusters')  # bug? why need to plot for tl.aga?
             logging.info("Running AGA")
             sc.tl.aga(adata, groups='Clusters', n_jobs=16)
             sc.settings.writedir = ""
+            logging.info("Writing AnnData to file")   
             sc.write(out_file, adata)
             os.rename(out_file + '.h5', out_file)
 

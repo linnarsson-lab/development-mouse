@@ -21,9 +21,8 @@ class PlotAGA(luigi.Task):
         return luigi.LocalTarget(os.path.join(dm.paths().build, f"AGA_{self.tissue}.png"))
 
     def run(self) -> None:
-        logging = cg.logging(self, True)
-        logging.info("Loading AGA object from h5 file")
         with self.output().temporary_path() as out_file:
             adata = sc.read(self.input().fn)   
             sc.pl.aga(adata, color='Clusters', layout='fr')
-            plt.savefig(out_file)
+            plt.savefig(out_file, format='png')
+
