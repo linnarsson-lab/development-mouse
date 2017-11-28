@@ -22,6 +22,7 @@ class PlotAGA(luigi.Task):
     def run(self) -> None:
         # add logging?
         with self.output().temporary_path() as out_file:
-            adata = sc.read(self.input())
+            adata = sc.read(self.input().fn)
+            print('outfile:', self.input().fn)            
             sc.pl.aga(adata, color='Clusters', layout='fr')
             plt.savefig(out_file)
