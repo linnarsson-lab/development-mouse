@@ -5,6 +5,7 @@ import luigi
 import development_mouse as dm
 import matplotlib.pyplot as plt
 import cytograph as cg
+import logging
 
 
 class PlotAGA(luigi.Task):
@@ -21,8 +22,9 @@ class PlotAGA(luigi.Task):
         return luigi.LocalTarget(os.path.join(dm.paths().build, f"AGA_{self.tissue}.png"))
 
     def run(self) -> None:
+        logging.info("Plotting AGA")
         with self.output().temporary_path() as out_file:
-            adata = sc.read(self.input().fn)   
+            adata = sc.read(self.input().fn)
             sc.pl.aga(adata, color='Clusters', layout='fr')
             plt.savefig(out_file, format='png')
-
+           
