@@ -82,7 +82,7 @@ class ExportL1(luigi.Task):
             logging.info("Plotting marker heatmap")
             cg.plot_markerheatmap(ds, dsagg, n_markers_per_cluster=self.n_markers, out_file=os.path.join(out_dir, "L1_" + self.tissue + "_heatmap.pdf"))
 
-            logging("Plotting quality class on t-SNE")
+            logging.info("Plotting quality class on t-SNE")
             cluster_mapping = {int(i.split(":")[0]): i.split(":")[1] 
                                for i in open(self.input()["NameQualityClusters"].fn).read().rstrip().split()}
             labelnames = [cluster_mapping[ix] for ix in cluster_mapping]
@@ -96,5 +96,5 @@ class ExportL1(luigi.Task):
             for tk in cbar.ax.get_yticklabels():
                 tk.set_weight("bold")
                 tk.set_fontsize(30)
-            plt.savefig(os.path.join(out_dir, "L1_" + self.tissue + "_tsne_quality.pdf"))
+            plt.savefig(os.path.join(out_dir, "L1_" + self.tissue + "_tsne_quality.png"))
             
