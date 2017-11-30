@@ -7,6 +7,8 @@ import networkx as nx
 import cytograph as cg
 import development_mouse as dm
 import luigi
+import matplotlib.colors as colors
+import matplotlib.pyplot as plt
 
 
 class ExportL1(luigi.Task):
@@ -28,7 +30,8 @@ class ExportL1(luigi.Task):
             passing ``tissue``
         """
         return {f"AggregateL1(tissue={self.tissue})": dm.AggregateL1(tissue=self.tissue),
-                f"ClusterL1(tissue={self.tissue})": dm.ClusterL1(tissue=self.tissue)}
+                f"ClusterL1(tissue={self.tissue})": dm.ClusterL1(tissue=self.tissue),
+                "NameQualityClusters": dm.NameQualityClusters()}
 
     def output(self) -> luigi.Target:
         """
@@ -79,5 +82,19 @@ class ExportL1(luigi.Task):
             logging.info("Plotting marker heatmap")
             cg.plot_markerheatmap(ds, dsagg, n_markers_per_cluster=self.n_markers, out_file=os.path.join(out_dir, "L1_" + self.tissue + "_heatmap.pdf"))
 
-
+            logging("Plotting quality class on t-SNE")
+            cluster_mapping = {int(i.split(":")[0]): i.split(":")[1] 
+                               for i in open(self.input()["NameQualityClusters"].fn).read().rstrip().split()}
+            labelnames = [cluster_mapping[ix] for ix in cluster_mapping]
+            cMap = colors.ListedColormap(plt.cm.tab20([ix for ix in cluster_mapping]))
+            labels = ds.col_attrs["QualityClass"].astype(int)
+            plt.figure(None, (20, 20))
+            plt.scatter(ds.col_attrs["_X"], ds.col_attrs["_Y"], c=labels, cmap=cMap, s=25)
+            cbar = plt.colorbar()
+            cbar.set_ticks([ix for ix in cluster_mapping])
+            cbar.set_ticklabels(labelnames)
+            for tk in cbar.ax.get_yticklabels():
+                tk.set_weight("bold")
+                tk.set_fontsize(30)
+            plt.savefig(os.path.join(out_dir, "L1_" + self.tissue + "_tsne_quality.pdf"))
             
