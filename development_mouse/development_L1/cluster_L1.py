@@ -82,9 +82,10 @@ class ClusterL1(luigi.Task):
             mito_size = ds.col_attrs["MitocondrialTotal"]
             ribo_size = ds.col_attrs["RibosomalTotal"]
             X = np.column_stack((initial_cell_size, initial_Ucell_size, detected_genes, mito_size, ribo_size))
+            X_log = np.log2(X + 1)
 
             logging.info("Using the QC Classifier to set QualityClass")
-            predicted = knc.predict(X)
+            predicted = knc.predict(X_log)
             qc_luster_labels = np.array([cluster_mapping[i] for i in predicted])
             ds.set_attr(name="QualityClass", values=qc_luster_labels, axis=1)
 
