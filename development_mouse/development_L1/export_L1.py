@@ -133,6 +133,7 @@ class ExportL1(luigi.Task):
                     
             logging.info("Plotting quality class in pie chart")
             plt.figure(None, (10, 10))
+            labels = ds.col_attrs["QualityClass"].astype(int)
             unique, counts = np.unique(labels, return_counts=True)
             labelnames = [cluster_mapping[ix] for ix in unique]
             patches, texts = plt.pie(counts)
