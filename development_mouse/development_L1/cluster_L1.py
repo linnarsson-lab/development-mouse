@@ -75,7 +75,7 @@ class ClusterL1(luigi.Task):
             logging.info("Deserializing QC Classifier")
             knc: KNeighborsClassifier = pickle.load(open(os.path.join(self.input()["MakeQualityClassifier"].fn, "QC_Classifier.pickle"), "rb"))
             logging.info("Reading NameQualityCluster file")
-            cluster_mapping = {int(i.split(":")[0]): i.split(":")[1] for i in open(self.input()["NameQualityClusters"].fn).read().rstrip().split()}
+            #cluster_mapping = {int(i.split(":")[0]): i.split(":")[1] for i in open(self.input()["NameQualityClusters"].fn).read().rstrip().split()}
             initial_cell_size = ds.col_attrs["SplicedTotal"]
             initial_Ucell_size = ds.col_attrs["UnsplicedTotal"]
             detected_genes = ds.col_attrs["TotalMolNoAmbiguous"]
@@ -86,8 +86,8 @@ class ClusterL1(luigi.Task):
 
             logging.info("Using the QC Classifier to set QualityClass")
             predicted = knc.predict(X_log)
-            qc_luster_labels = np.array([cluster_mapping[i] for i in predicted])
-            ds.set_attr(name="QualityClass", values=qc_luster_labels, axis=1)
+            #qc_luster_labels = np.array([cluster_mapping[i] for i in predicted])
+            ds.set_attr(name="QualityClass", values=predicted, axis=1)
 
             # NOTE for now the quality class is only written and not used anywhere
 
