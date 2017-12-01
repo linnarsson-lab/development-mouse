@@ -96,5 +96,12 @@ class ExportL1(luigi.Task):
             for tk in cbar.ax.get_yticklabels():
                 tk.set_weight("bold")
                 tk.set_fontsize(30)
-            plt.savefig(os.path.join(out_dir, "L1_" + self.tissue + "_tsne_quality.png"))
+            plt.savefig(os.path.join(out_dir, "L1_" + self.tissue + "_quality_tsne.png"))
             
+            logging.info("Plotting quality class in pie chart")
+            plt.figure(None, (10, 10))
+            unique, counts = np.unique(labels, return_counts=True)
+            labelnames = [cluster_mapping[ix] for ix in unique]
+            patches, texts = plt.pie(counts)
+            plt.legend(patches, labelnames, bbox_to_anchor=(0.1, 1), fontsize=15)
+            plt.savefig(os.path.join(out_dir, "L1_" + self.tissue + "_quality_pie.png"))
