@@ -16,7 +16,7 @@ class Sample(luigi.ExternalTask):
 
     def output(self) -> luigi.LocalTarget:
         if not dm.paths().not_use_velocyto:
-            fname = os.path.join(dm.paths().samples, self.sample, "velocyto", self.sample + ".loom")
+            fname = os.path.join(dm.paths().samples, self.sample, "velocyto_v12", self.sample + ".loom")
             return luigi.LocalTarget(fname)
         else:
             fname = os.path.join(dm.paths().samples, self.sample, self.sample + ".loom")

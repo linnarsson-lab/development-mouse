@@ -14,7 +14,7 @@ import luigi
 class VisualizeVelocity(luigi.Task):
     """Luigi Task to run velocyto
     """
-    tissue = luigi.Parameter(description="name of the tissue from tool specification file.",
+    tissue = luigi.Parameter(description="name of the tissue from pool specification file.",
                              always_in_help=True)
 
     def requires(self) -> List[luigi.Task]:

@@ -10,6 +10,7 @@ import logging
 import loompy
 import numpy as np
 
+
 class PlotAGA(luigi.Task):
     """
     Luigi task to plot scanpy AGA
@@ -19,7 +20,7 @@ class PlotAGA(luigi.Task):
 
     def requires(self) -> List[luigi.Task]:
         return [dm.ClusterL1(tissue=self.tissue),
-		dm.RunAGA(tissue=self.tissue)]
+                dm.RunAGA(tissue=self.tissue)]
 
     def output(self) -> luigi.Target:
         return luigi.LocalTarget(os.path.join(dm.paths().build, f"AGA_{self.tissue}.png"))
