@@ -41,8 +41,8 @@ class PlotAGA(luigi.Task):
                 for i in clusters:
                     x = np.median(ds.col_attrs["_X"][label == i])
                     y = np.median(ds.col_attrs["_Y"][label == i])
-                    ax1.text(x, y, np.unique(label)[i], fontsize=10, bbox={"facecolor":"w", "alpha":0.6})
+                    ax1.text(x, y, np.unique(label)[i], fontsize=10, bbox={"facecolor": "w", "alpha": 0.6})
                 ax1.set_title('cytograph clusters')
                 sc.pl.aga_graph(adata, ax=ax2, node_size_scale=2, edge_width_scale=1.5, fontsize=15)
                 fig.tight_layout()
-                fig.savefig(out_file, format='png', dpi=300)           
+                fig.savefig(out_file, format='png', dpi=300)

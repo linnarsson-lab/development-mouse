@@ -52,7 +52,7 @@ class VisualizeVelocity(luigi.Task):
             n_neighbors = int(vlm.S.shape[1] / 5)
             vlm.estimate_transition_prob(hidim="Sx_sz", embed="ts", transform="sqrt",
                                          n_neighbors=n_neighbors, knn_random=True, sampled_fraction=1,
-                                         n_jobs=dm.threads().limit, threads=dm.threads().limit
+                                         n_jobs=dm.threads().limit, threads=dm.threads().limit)
             # NOTE here we might want to tune the number of jobs used in relation to the number of concurrent tasks
             # NOTE here we might want to change the sampled fraction to a lower number to make things faster
 
