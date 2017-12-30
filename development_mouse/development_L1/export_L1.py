@@ -24,12 +24,12 @@ class ExportL1(luigi.Task):
         """
         Arguments
         ---------
-        `AggregateL1`:
+        `AbstractL1`:
             passing ``tissue``
         `ClusterL1`:
             passing ``tissue``
         """
-        return {f"AggregateL1(tissue={self.tissue})": dm.AggregateL1(tissue=self.tissue),
+        return {f"AbstractL1(tissue={self.tissue})": dm.AbstractL1(tissue=self.tissue),
                 f"ClusterL1(tissue={self.tissue})": dm.ClusterL1(tissue=self.tissue),
                 "NameQualityClusters": dm.NameQualityClusters()}
 
@@ -44,7 +44,7 @@ class ExportL1(luigi.Task):
 
     def run(self) -> None:
         """
-        Reads the output of `AggregateL1` and does:
+        Reads the output of `AbstractL1` and does:
             - runs the `cytograph.AutoAnnotator`
             - exports  ``L1_[TISSUE]_expression.tab``, ``L1_[TISSUE]_enrichment.tab``, ``L1_[TISSUE]_trinaries.tab``
             - uses `cytograph.plot_graph` to plot ``L1_[TISSUE]_manifold.aa.png``, ``L1_[TISSUE]_manifold.aaa.png``
@@ -61,19 +61,24 @@ class ExportL1(luigi.Task):
         with self.output().temporary_path() as out_dir:
             if not os.path.exists(out_dir):
                 os.mkdir(out_dir)
-            dsagg = loompy.connect(self.input()[f"AggregateL1(tissue={self.tissue})"].fn)
+            dsagg = loompy.connect(self.input()[f"AbstractL1(tissue={self.tissue})"].fn)
 
             dsagg.export(os.path.join(out_dir, "L1_" + self.tissue + "_expression.tab"))
             dsagg.export(os.path.join(out_dir, "L1_" + self.tissue + "_enrichment.tab"), layer="enrichment")
             dsagg.export(os.path.join(out_dir, "L1_" + self.tissue + "_enrichment_q.tab"), layer="enrichment_q")
             dsagg.export(os.path.join(out_dir, "L1_" + self.tissue + "_trinaries.tab"), layer="trinaries")
+            # NOTE: maybe we should have dsagg.export(*, layer="abstraction")
 
             ds = loompy.connect(self.input()[f"ClusterL1(tissue={self.tissue})"].fn)
 
             logging.info("Plotting manifold graph with auto-annotation")
             tags = list(dsagg.col_attrs["AutoAnnotation"])
             cg.plot_graph(ds, os.path.join(out_dir, "L1_" + self.tissue + "_manifold.aa.png"), tags)
+            logging.info("Plotting manifold graph with auto-annotation, colored by age")
             cg.plot_graph_age(ds, os.path.join(out_dir, "L1_" + self.tissue + "_manifold.age.png"), tags)
+
+            #logging.info("Plotting abstracted graph with auto-annotation")
+            #cg.plot_graph(ds, os.path.join(out_dir, "L1_" + self.tissue + "_manifold.aa.png"), tags)
 
             logging.info("Plotting manifold graph with auto-auto-annotation")
             tags = list(dsagg.col_attrs["MarkerGenes"])
@@ -84,8 +89,7 @@ class ExportL1(luigi.Task):
 
             logging.info("Plotting quality class on t-SNE")
             tags = list(dsagg.col_attrs["AutoAnnotation"])
-            cluster_mapping = {int(i.split(":")[0]): i.split(":")[1] 
-                                    for i in open(self.input()["NameQualityClusters"].fn).read().rstrip().split()}
+            cluster_mapping = {int(i.split(":")[0]): i.split(":")[1] for i in open(self.input()["NameQualityClusters"].fn).read().rstrip().split()}
             n_cells = ds.shape[1]
             valid = ds.col_attrs["_Valid"].astype('bool')
             
@@ -95,7 +99,7 @@ class ExportL1(luigi.Task):
             orderx = np.argsort(sfdp[:, 0], kind="mergesort")
             ordery = np.argsort(sfdp[:, 1], kind="mergesort")
             orderfin = orderx[ordery]
-            sfdp_original = sfdp.copy()  
+            sfdp_original = sfdp.copy()
             sfdp = sfdp[orderfin, :]
             labels = ds.col_attrs["Clusters"][valid][orderfin]
             quality = ds.col_attrs["QualityClass"].astype(float)[valid][orderfin]
