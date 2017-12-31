@@ -74,7 +74,7 @@ def plot_abs_graph(ds: loompy.LoomConnection, dsagg: loompy.LoomConnection, out_
 
     # Draw abstracted graph nodes and their IDS
     logging.info("Drawing cluster graph nodes and IDs")
-    plt.scatter(pos_ag[:, 0], pos_ag[:, 1], c=colors20[np.mod(np.arange(pos_ag.shape[0]), 20)], m='o', s=100, alpha=0.8, zorder=20000)
+    plt.scatter(pos_ag[:, 0], pos_ag[:, 1], c=colors20[np.mod(np.arange(pos_ag.shape[0]), 20)], marker='o', s=150, alpha=0.8, zorder=20000)
     for lbl in range(0, max(labels) + 1):
         (x, y) = pos_ag[lbl, :]  # np.median(pos[np.where(labels == lbl)[0]], axis=0)
         ax.text(x, y, str(lbl), fontsize=12, bbox=dict(facecolor='white', alpha=0.5, ec='none'))
