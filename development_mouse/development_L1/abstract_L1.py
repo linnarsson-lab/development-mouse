@@ -51,5 +51,5 @@ class AbstractL1(luigi.Task):
             abstraction = cg.GraphAbstraction(kind="simple")
             agraph = abstraction.abstract(ds=ds, thresh_confid=self.confidence, unidirectional=False)
             ds.close()
-            dsagg.set_edges("AbstractGraph", agraph.row, agraph.col, agraph.data)
+            dsagg.set_edges("AbstractGraph", agraph.row, agraph.col, agraph.data, axis=1)
             dsagg.close()
