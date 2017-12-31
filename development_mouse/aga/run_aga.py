@@ -1,7 +1,6 @@
 import os
 from typing import *
 import numpy as np
-import scanpy.api as sc
 import luigi
 import loompy
 import development_mouse as dm
@@ -24,6 +23,7 @@ class RunAGA(luigi.Task):
 
     def run(self) -> None:
         with self.output().temporary_path() as out_file:
+            import scanpy.api as sc
             logging.info("Loading loom file into AnnData object")
             ds = loompy.connect(self.input().fn)
             adata = sc.AnnData(np.transpose(ds[:, :]))
