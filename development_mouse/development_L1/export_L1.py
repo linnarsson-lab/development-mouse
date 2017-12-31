@@ -78,7 +78,7 @@ class ExportL1(luigi.Task):
             cg.plot_graph_age(ds, os.path.join(out_dir, "L1_" + self.tissue + "_manifold.age.png"), tags)
 
             logging.info("Plotting abstracted graph with auto-annotation")
-            dm.plot_abs_graph(ds, dsagg, os.path.join(out_dir, "L1_" + self.tissue + "_manifold.aa.png"), tags)
+            dm.plot_abs_graph(ds, dsagg, os.path.join(out_dir, "L1_" + self.tissue + "_absgraph.aa.png"), tags)
 
             logging.info("Plotting manifold graph with auto-auto-annotation")
             tags = list(dsagg.col_attrs["MarkerGenes"])
