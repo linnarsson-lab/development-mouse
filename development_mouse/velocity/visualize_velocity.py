@@ -68,7 +68,7 @@ class VisualizeVelocity(luigi.Task):
 
             vlm.calculate_grid_arrows(smooth=0.8, steps=(40, 40), n_neighbors=300)  # NOTE: this parameters could be tuned
 
-            plt.figure(None, (20, 20))
+            plt.figure(None, (14, 14))
             vlm.plot_grid_arrows(scatter_kwargs_dict={"alpha": 0.35, "lw": 0.35, "edgecolor": "0.4", "s": 38, "rasterized": True},
                                  min_mass=10, angles='xy', scale_units='xy',
                                  headaxislength=2.75, headlength=5, headwidth=4.8, quiver_scale=0.25)

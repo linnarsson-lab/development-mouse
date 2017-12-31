@@ -53,4 +53,3 @@ class AbstractL1(luigi.Task):
             ds.close()
             dsagg.set_edges("AbstractGraph", agraph.row, agraph.col, agraph.data)
             dsagg.close()
-            
