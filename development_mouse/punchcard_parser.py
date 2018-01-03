@@ -104,6 +104,8 @@ def parse_punchcard_run(punchcard_obj: Dict) -> Iterator[luigi.Task]:
     for k, v in dm.__dict__.items():
         if type(v) == luigi.task_register.Register:
             safenames |= {k}
+    if punchcard_obj["run"] is None:
+        return None
     for task2run in punchcard_obj["run"]:
         task_type, task_kwargs = task2run["type"], task2run["kwargs"]
         if task_type not in safenames:
