@@ -25,7 +25,7 @@ class VisualizeVelocity(luigi.Task):
             passing ``tissue``
         """
         # NOTE: not sure it needs AggregateL1
-        return dm.EstimateVelocity(tissue=self.tissue)
+        return [dm.EstimateVelocity(tissue=self.tissue), dm.AbstractL1(tissue=self.tissue)]
 
     def output(self) -> luigi.Target:
         """
@@ -45,8 +45,13 @@ class VisualizeVelocity(luigi.Task):
             if not os.path.exists(out_dir):
                 os.mkdir(out_dir)
 
-            logging.info(f"Loading {self.input().fn} as a VelocytoLoom object")
-            vlm = vcy.load_velocyto_hdf5(self.input().fn)
+            logging.info(f"Loading tags from the exported file {self.input()[1].fn}")
+            dsagg = loompy.connect(self.input()[1].fn)
+            tags = list(dsagg.col_attrs["AutoAnnotation"])
+            dsagg.close()
+
+            logging.info(f"Loading {self.input()[0].fn} as a VelocytoLoom object")
+            vlm = vcy.load_velocyto_hdf5(self.input()[0].fn)
 
             logging.info(f"Estimating transition probability. Note: This step will require a bit of time")
             n_neighbors = int(vlm.S.shape[1] / 5)
@@ -62,6 +67,12 @@ class VisualizeVelocity(luigi.Task):
             # Dump to a temp and only substitute the original file, atomically just before the folder velocity_[TISSUE]_export get created
             tmp_file = tempfile.mktemp(dir=os.path.join(dm.paths().build))
             # I get if I leave the default dir: OSError: [Errno 18] Invalid cross-device link: '/tmp/tmphnvw5x6_' -> '/data/proj/development/build_20171115/velocity_Forebrain_E9-11.hdf5'
+            
+            # Run the abstracted graph and velocity summary
+            confidence = cg.adjacency_confidence(vlm.knn.tocoo(), vlm.cluster_ix, symmetric=True)
+            significant, trans, expected_tr = cg.velocity_summary(vlm)
+            vlm.dm_confidence, vlm.dm_significant, vlm.dm_trans, vlm.dm_expected_tr = confidence, significant, trans, expected_tr
+
             vlm.to_hdf5(tmp_file)
 
             vlm.calculate_embedding_shift(sigma_corr=0.05)  # NOTE: this parameter could be tuned
@@ -69,9 +80,22 @@ class VisualizeVelocity(luigi.Task):
             vlm.calculate_grid_arrows(smooth=0.8, steps=(40, 40), n_neighbors=300)  # NOTE: this parameters could be tuned
 
             plt.figure(None, (14, 14))
+            # NOTE: the one below should be updated to include autoannotaiton and legend
             vlm.plot_grid_arrows(scatter_kwargs_dict={"alpha": 0.35, "lw": 0.35, "edgecolor": "0.4", "s": 38, "rasterized": True},
                                  min_mass=10, angles='xy', scale_units='xy',
                                  headaxislength=2.75, headlength=5, headwidth=4.8, quiver_scale=0.25)
+
             # NOTE: this parameters could be tuned. In particular min_mass!
             plt.savefig(os.path.join(out_dir, "velocity_" + self.tissue + "_TSNE.png"))
+
+            plt.figure(None, (9, 9))
+            cg.plot_confidence_and_velocity(trans, expected_tr, confidence)
+            plt.savefig(os.path.join(out_dir, "velocity_" + self.tissue + "_transitions.png"))
+
+            plt.figure(None, (14, 14))
+            dm.plot_velocity_summary(vlm, confidence, significant, trans, expected_tr,
+                                     out_file=os.path.join(out_dir, "velocity_" + self.tissue + "_summary.png"),
+                                     tags=tags)
+            plt.savefig()
+            
             os.rename(tmp_file, os.path.join(dm.paths().build, f"velocity_{self.tissue}.hdf5"))  # Atomic substitution of a previous file

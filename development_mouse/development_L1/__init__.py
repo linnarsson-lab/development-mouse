@@ -4,3 +4,6 @@ from .abstract_L1 import AbstractL1
 from .level1 import Level1
 from .level1_analysis import Level1Analysis
 from .export_L1 import ExportL1
+from .estimate_velocity import EstimateVelocity
+from .visualize_velocity import VisualizeVelocity
+from .velocity_analysis import VelocityAnalysis
