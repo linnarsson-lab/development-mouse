@@ -11,7 +11,9 @@ import copy
 # those are the analyses allowed, if a kind of analysis is not here cannot be run using the punchcard submodule
 require_type_dict = {"AggregatePunchcard": dm.AggregatePunchcard,
                      "ClusterPunchcard": dm.ClusterPunchcard,
+                     "ClusterL1": dm.ClusterL1,
                      "ExportPunchcard": dm.ExportPunchcard,
+                     "ExportL1": dm.ExportL1,
                      "PunchcardPool": dm.PunchcardPool,
                      "DiagnosticVelocityPunchcard": dm.DiagnosticVelocityPunchcard,
                      "AggregatePunchcard": dm.EstimateVelocityPunchcard,
