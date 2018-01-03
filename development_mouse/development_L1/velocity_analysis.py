@@ -20,7 +20,7 @@ class VelocityAnalysis(luigi.WrapperTask):
     Yields ``VisualizeVelocity(tissue) for tissue in project``
     """
 
-    project = luigi.Parameter(default="Development", description="str, default=Development\nSpecify set of ``tissues`` that will analyzed. Info is gathered using the ``pool_specification.tab`` file") 
+    project = luigi.Parameter(default="Development", description="str, default=Development\nSpecify set of ``tissues`` that will analyzed. Info is gathered using the ``pool_specification.tab`` file")
     # NOTE: This could be hardcoded since the pipeline split, but I leave it as an option for more flexibility.
 
     def requires(self) -> Iterator[luigi.Task]:

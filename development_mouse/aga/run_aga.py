@@ -35,6 +35,6 @@ class RunAGA(luigi.Task):
             logging.info("Running AGA")
             sc.tl.aga(adata, groups='Clusters', n_jobs=16)
             sc.settings.writedir = ""
-            logging.info("Writing AnnData to file")  
+            logging.info("Writing AnnData to file")
             sc.write(out_file, adata)
             os.rename(out_file + '.h5', out_file)

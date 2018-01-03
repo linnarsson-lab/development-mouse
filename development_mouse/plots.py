@@ -79,7 +79,7 @@ def plot_abs_graph(ds: loompy.LoomConnection, dsagg: loompy.LoomConnection, out_
         (x, y) = pos_ag[lbl, :]  # np.median(pos[np.where(labels == lbl)[0]], axis=0)
         ax.text(x, y, str(lbl), fontsize=12, bbox=dict(facecolor='white', alpha=0.5, ec='none'))
 
-    # Drawing legend    
+    # Drawing legend
     logging.info("Drawing legend")
     plt.legend(plots, names, scatterpoints=1, markerscale=2, loc='upper left', bbox_to_anchor=(1, 1), fancybox=True, framealpha=0.5, fontsize=10)
     
@@ -125,9 +125,9 @@ def plot_velocity_summary(vlm: Any, confidence: np.ndarray, significant: np.ndar
             names.append(str(i))
 
     # Retrieve graph info from AggregateL1 results
-    #(a, b, w) = dsagg.get_edges("AbstractGraph", axis=1)
+    # (a, b, w) = dsagg.get_edges("AbstractGraph", axis=1)
     confidence_ = np.copy(confidence)
-    confidence_[confidence_ < 0.2] = 0 # NOTE: this threshold is a bit arbitrary
+    confidence_[confidence_ < 0.2] = 0  # NOTE: this threshold is a bit arbitrary
     abs_graph = sparse.coo_matrix(confidence_)
     a, b, w = abs_graph.row, abs_graph.col, abs_graph.data
 
@@ -166,7 +166,7 @@ def plot_velocity_summary(vlm: Any, confidence: np.ndarray, significant: np.ndar
         (x, y) = pos_ag[lbl, :]  # np.median(pos[np.where(labels == lbl)[0]], axis=0)
         ax.text(x, y, str(lbl), fontsize=12, bbox=dict(facecolor='white', alpha=0.5, ec='none'))
 
-    # Drawing lagend    
+    # Drawing lagend
     logging.info("Drawing legend")
     plt.legend(plots, names, scatterpoints=1, markerscale=2, loc='upper left', bbox_to_anchor=(1, 1), fancybox=True, framealpha=0.5, fontsize=10)
     
