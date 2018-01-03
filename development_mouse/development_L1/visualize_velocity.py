@@ -73,6 +73,12 @@ class VisualizeVelocity(luigi.Task):
             significant, trans, expected_tr = cg.velocity_summary(vlm)
             vlm.dm_confidence, vlm.dm_significant, vlm.dm_trans, vlm.dm_expected_tr = confidence, significant, trans, expected_tr
 
+            # NOTE: This was placed here for testing purposes, after testing put as last plot
+            plt.figure(None, (14, 14))
+            dm.plot_velocity_summary(vlm, confidence, significant, trans, expected_tr,
+                                     out_file=os.path.join(out_dir, "velocity_" + self.tissue + "_summary.png"),
+                                     tags=tags)
+
             vlm.to_hdf5(tmp_file)
 
             vlm.calculate_embedding_shift(sigma_corr=0.05)  # NOTE: this parameter could be tuned
@@ -91,10 +97,5 @@ class VisualizeVelocity(luigi.Task):
             plt.figure(None, (9, 9))
             cg.plot_confidence_and_velocity(trans, expected_tr, confidence)
             plt.savefig(os.path.join(out_dir, "velocity_" + self.tissue + "_transitions.png"))
-
-            plt.figure(None, (14, 14))
-            dm.plot_velocity_summary(vlm, confidence, significant, trans, expected_tr,
-                                     out_file=os.path.join(out_dir, "velocity_" + self.tissue + "_summary.png"),
-                                     tags=tags)
             
             os.rename(tmp_file, os.path.join(dm.paths().build, f"velocity_{self.tissue}.hdf5"))  # Atomic substitution of a previous file
