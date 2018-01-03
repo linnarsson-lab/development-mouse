@@ -26,4 +26,4 @@ class Punchcard(luigi.WrapperTask):  # Status: check what it should return
 		other_tasks = []
 		for task in dm.parse_punchcard_run(punchcard_obj):
 			other_tasks.append(task(self.card))
-		return [dm.ExportPunchcard(card=self.card), *other_tasks]  # Not sure why but before t was [[]]
+		return [dm.ClusterPunchcard(card=self.card), dm.ExportPunchcard(card=self.card), *other_tasks]  # Not sure why but before t was [[]]

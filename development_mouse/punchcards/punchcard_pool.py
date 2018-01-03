@@ -37,7 +37,7 @@ class PunchcardPool(luigi.Task):  # Status: check the filter manager
 			# Try to drop the assumptio that
 			# clustering and the autoannotation are the i
 			for input_dict in self.input():
-				clustered, autoannotated = input_dict["ClusterL1"], input_dict["ExportL1"]
+				clustered, autoannotated = input_dict[0], input_dict[1]
 				logging.debug(f"Adding cells from the source file {clustered.fn}")
 				ds = loompy.connect(clustered.fn)
 				
