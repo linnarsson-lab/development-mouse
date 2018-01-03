@@ -96,6 +96,5 @@ class VisualizeVelocity(luigi.Task):
             dm.plot_velocity_summary(vlm, confidence, significant, trans, expected_tr,
                                      out_file=os.path.join(out_dir, "velocity_" + self.tissue + "_summary.png"),
                                      tags=tags)
-            plt.savefig()
             
             os.rename(tmp_file, os.path.join(dm.paths().build, f"velocity_{self.tissue}.hdf5"))  # Atomic substitution of a previous file
