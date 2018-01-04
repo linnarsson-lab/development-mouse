@@ -37,12 +37,15 @@ class PunchcardPool(luigi.Task):  # Status: check the filter manager
 			# Try to drop the assumption that
 			# clustering and the autoannotation are the i
 			for input_dict in self.input():
-				clustered, autoannotated = input_dict[0], input_dict[1]
+				# NOTE: autoannotated is an Export Task but really an Aggragate task is enough, this is just for compatibility 
+				clustered, export_folder = input_dict[0], input_dict[1]
+				autoannotated_fn = clustered.fn[:-5] + ".agg.loom"  # NOTE: this is some kind of workaround, points to the Aggragate task output
 				logging.debug(f"Adding cells from the source file {clustered.fn}")
 				ds = loompy.connect(clustered.fn)
+				dsagg = loompy.connect(autoannotated_fn)
 				
 				# Select the tags as specified in the process file
-				filter_bool = cg.FilterManager(analysis_obj, ds, autoannotated.fn).compute_filter()
+				filter_bool = cg.FilterManager(analysis_obj, ds, dsagg).compute_filter()
 
 				# NOTE: I don't know if the code below is updated
 				for (ix, selection, vals) in ds.batch_scan_layers(axis=1, batch_size=dm.memory().axis1):
