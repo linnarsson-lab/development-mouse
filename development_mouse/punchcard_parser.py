@@ -96,11 +96,12 @@ def parse_punchcard_require(punchcard_obj: Dict) -> List[luigi.Task]:
             raise NotImplementedError(f"Task type: {requirement_type} not allowed, you need to allow it adding it to require_type_dict")
         Task = require_type_dict[requirement_type]
         if issubclass(Task, luigi.WrapperTask):
-            requirements += list(Task(**requirement_kwargs).requires())
+            for requirement_list in Task(**requirement_kwargs).requires():
+                requirements.append(requirement_list)
         else:
             if c == 0:
-                requirements += [Task(**requirement_kwargs)]
-                c+=1
+                requirements.append([Task(**requirement_kwargs)])
+                c += 1
             else:
                 requirements[-1].append(Task(**requirement_kwargs))
     return requirements
