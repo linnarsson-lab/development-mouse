@@ -81,12 +81,12 @@ class PunchcardParser(object):  # Status: needs to be run but looks ok
         return self._analyses_dict[key]
 
 
-def parse_punchcard_require(punchcard_obj: Dict) -> List[Tuple[luigi.Task]]:
+def parse_punchcard_require(punchcard_obj: Dict) -> List[luigi.Task]:
     """Takes a dictionary parsed from the yaml file and returns the correspnding list of Tasks requirement
 
     The current version assumes that the input wil always be a WrapperTask
     """
-    requirements: List[luigi.WrapperTask] = []
+    requirements: List[luigi.Task] = []
     for i in range(len(punchcard_obj["require"])):
         requirement_entry = punchcard_obj["require"][i]
         requirement_type = requirement_entry["type"]
@@ -94,7 +94,10 @@ def parse_punchcard_require(punchcard_obj: Dict) -> List[Tuple[luigi.Task]]:
         if requirement_type not in require_type_dict:
             raise NotImplementedError(f"Task type: {requirement_type} not allowed, you need to allow it adding it to require_type_dict")
         Task = require_type_dict[requirement_type]
-        requirements += list(Task(**requirement_kwargs).requires())
+        if issubclass(Task, luigi.WrapperTask):
+            requirements += list(Task(**requirement_kwargs).requires())
+        else:
+            equirements += [Task(**requirement_kwargs)]
     return requirements
 
 
@@ -115,7 +118,7 @@ def parse_punchcard_run(punchcard_obj: Dict) -> Iterator[luigi.Task]:
         else:
             Task_class = getattr(dm, task_type)  # eval("cg.%s" % analysis_type)
 
-            def Task(analysis: Any) -> luigi.Task:
-                return Task_class(analysis, **task_kwargs)
+            def Task(card: Any) -> luigi.Task:
+                return Task_class(card, **task_kwargs)
             
             yield Task
