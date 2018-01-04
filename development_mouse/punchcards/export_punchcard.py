@@ -31,13 +31,13 @@ class ExportPunchcard(luigi.Task):
         with self.output().temporary_path() as out_dir:
             if not os.path.exists(out_dir):
                 os.mkdir(out_dir)
-            dsagg = loompy.connect(self.input()[0].fn)
+            dsagg = loompy.connect(self.input()[1].fn)
             dsagg.export(os.path.join(out_dir, f"{self.card}_expression.tab"))
             dsagg.export(os.path.join(out_dir, f"{self.card}_enrichment.tab"), layer="enrichment")
             dsagg.export(os.path.join(out_dir, f"{self.card}_enrichment_q.tab"), layer="enrichment_q")
             dsagg.export(os.path.join(out_dir, f"{self.card}_trinaries.tab"), layer="trinaries")
 
-            ds = loompy.connect(self.input()[1].fn)
+            ds = loompy.connect(self.input()[0].fn)
 
             logging.info(f"Plotting manifold graph with auto-annotation for {self.card}")
             tags = list(dsagg.col_attrs["AutoAnnotation"])
