@@ -118,7 +118,7 @@ def plot_velocity_summary(vlm: Any, confidence: np.ndarray, significant: np.ndar
     names = []
     for i in range(max(labels) + 1):
         cluster = labels == i
-        plots.append(plt.scatter(x=pos[cluster, 0], y=pos[cluster, 1], c=colors20[np.mod(i, 20)], marker='.', lw=0, s=epsilon, alpha=0.05, zorder=-1))
+        plots.append(plt.scatter(x=pos[cluster, 0], y=pos[cluster, 1], c=colors20[np.mod(i, 20)], marker='.', lw=0, s=epsilon, alpha=0.1, zorder=-1))
         if tags is not None:
             names.append(str(i) + " " + tags[i].replace("\n", " "))
         else:
@@ -138,11 +138,11 @@ def plot_velocity_summary(vlm: Any, confidence: np.ndarray, significant: np.ndar
 
     # Draw abstracted graph edges
     logging.info("Drawing edges")
-    confidence_bins_pars = {(0, 0.25): ('dotted', 0.5, 0.3),
-                            (0.25, 0.5): ('dotted', 1, 0.3),
-                            (0.5, 0.75): ('dashed', 2, 0.5),
-                            (0.75, 0.9): ('solid', 3, 0.7),
-                            (0.9, 1): ('solid', 7, 0.9)}
+    confidence_bins_pars = {(0, 0.25): ('dotted', 0.5, 0.1),
+                            (0.25, 0.5): ('dotted', 1, 0.1),
+                            (0.5, 0.75): ('dashed', 2, 0.1),
+                            (0.75, 0.95): ('solid', 3, 0.2),
+                            (0.95, 1): ('solid', 5, 0.4)}
     for (m, M), (line_style, line_width, alpha) in confidence_bins_pars.items():
         is_in_bin = (w > m) & (w <= M)
         if np.any(is_in_bin):
@@ -157,14 +157,19 @@ def plot_velocity_summary(vlm: Any, confidence: np.ndarray, significant: np.ndar
         (x2, y2) = pos_ag[lbl_to, :]
         dx = x2 - x
         dy = y2 - y
-        plt.arrow(x, y, dx, dy, zorder=200000, length_includes_head=True, width=1)
+        plt.arrow(x, y, dx, dy, zorder=50000, length_includes_head=True,
+                  width=2 * trans[lbl_from, lbl_to], fc="none", alpha=1, ec="k", lw=1)
 
     # Draw abstracted graph nodes and their IDS
     logging.info("Drawing cluster graph nodes and IDs")
-    plt.scatter(pos_ag[:, 0], pos_ag[:, 1], c=colors20[np.mod(np.arange(pos_ag.shape[0]), 20)], marker='o', s=250, alpha=0.8, zorder=20000)
+    plt.scatter(pos_ag[:, 0], pos_ag[:, 1], facecolor="none",
+                edgecolor=colors20[np.mod(np.arange(pos_ag.shape[0]), 20)],
+                marker='o', s=350, alpha=1, lw=2.5, zorder=10000)
+    plt.scatter(pos_ag[:, 0], pos_ag[:, 1], facecolor=colors20[np.mod(np.arange(pos_ag.shape[0]), 20)], marker='o', s=350, alpha=0.3, lw=0, zorder=100000)
     for lbl in range(0, max(labels) + 1):
         (x, y) = pos_ag[lbl, :]  # np.median(pos[np.where(labels == lbl)[0]], axis=0)
-        ax.text(x, y, str(lbl), fontsize=12, bbox=dict(facecolor='white', alpha=0.5, ec='none'))
+        ax.text(x, y, str(lbl), fontsize=11, bbox=dict(facecolor=colors20[np.mod(lbl, 20)],
+                                                       alpha=0.3, ec='none'), zorder=300000)
 
     # Drawing lagend
     logging.info("Drawing legend")
