@@ -155,9 +155,9 @@ def plot_velocity_summary(vlm: Any, confidence: np.ndarray, significant: np.ndar
         lbl_from, lbl_to = c[i], d[i]
         (x, y) = pos_ag[lbl_from, :]
         (x2, y2) = pos_ag[lbl_to, :]
-        dx = x - x2
-        dy = y - y2
-        plt.arrow(x, y, dx, dy)
+        dx = x2 - x
+        dy = y2 - y
+        plt.arrow(x, y, dx, dy, zorder=200000, length_includes_head=True, width=1)
 
     # Draw abstracted graph nodes and their IDS
     logging.info("Drawing cluster graph nodes and IDs")
