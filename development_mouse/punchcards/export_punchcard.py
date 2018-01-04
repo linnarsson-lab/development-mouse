@@ -18,8 +18,9 @@ class ExportPunchcard(luigi.Task):
     n_markers = luigi.IntParameter(default=10, description="number of markers to export")
 
     def requires(self) -> List[luigi.Task]:
-        return [dm.AggregatePunchcard(card=self.card),
-                dm.ClusterPunchcard(card=self.card)]
+        # NOTE before the order was AggregatePunchcard, ClusterPunchcard but did not make sense
+        return [dm.ClusterPunchcard(card=self.card),
+                dm.AggregatePunchcard(card=self.card)]
 
     def output(self) -> luigi.Target:
         return luigi.LocalTarget(os.path.join(dm.paths().build, f"{self.card}_exported"))

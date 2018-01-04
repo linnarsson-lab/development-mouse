@@ -32,10 +32,12 @@ class PunchcardPool(luigi.Task):  # Status: check the filter manager
 	def run(self) -> None:
 		analysis_obj = dm.PunchcardParser()[self.card]
 		logging.debug(f"Generating the pooled file {self.card}.loom")
+		
 		with self.output().temporary_path() as out_file:
 			dsout: loompy.LoomConnection = None
 			# Try to drop the assumption that
 			# clustering and the autoannotation are the i
+			cluster_counter = 0
 			for input_dict in self.input():
 				# NOTE: autoannotated is an Export Task but really an Aggragate task is enough, this is just for compatibility 
 				clustered, export_folder = input_dict[0], input_dict[1]
@@ -58,7 +60,12 @@ class PunchcardPool(luigi.Task):  # Status: check the filter manager
 						m[layer_name] = vals[layer_name][:, subset - ix]
 					ca = {}
 					for key in ds.col_attrs:
-						ca[key] = ds.col_attrs[key][subset]
+						if key == "Clusters":
+							# NOTE Special attention not to merge clusters
+							ca["Clusters_original"] = ds.col_attrs[key][subset]
+							ca[key] = ds.col_attrs[key][subset] + cluster_counter
+						else:
+							ca[key] = ds.col_attrs[key][subset]
 					# Add data to the loom file
 					if dsout is None:
 						# create using main layer
@@ -70,3 +77,8 @@ class PunchcardPool(luigi.Task):  # Status: check the filter manager
 							dsout.set_layer(layer_name, chunk_of_matrix, dtype=chunk_of_matrix.dtype)
 					else:
 						dsout.add_columns(m, ca)
+				# NOTE Special attention not to merge clusters
+				renumbered_clusters = np.copy(dsout.col_attrs["Clusters"])
+				_, renumbered_clusters[renumbered_clusters >= 0] = np.unique(renumbered_clusters[renumbered_clusters >= 0], return_inverse=True)
+				dsout.set_attr("Clusters", renumbered_clusters, axis=1)
+				cluster_counter = np.max(renumbered_clusters) + 1

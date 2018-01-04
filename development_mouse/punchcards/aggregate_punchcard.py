@@ -22,7 +22,7 @@ class AggregatePunchcard(luigi.Task):  # Status: Ok
 	n_auto_genes = luigi.IntParameter(default=6, description="Number of genes to use in the AutoAutoannotation")
 
 	def requires(self) -> List[luigi.Task]:
-		return dm.PunchcardPool(card=self.card)
+		return dm.ClusterPunchcard(card=self.card)
 
 	def output(self) -> luigi.Target:
 		return luigi.LocalTarget(os.path.join(dm.paths().build, f"{self.card}.agg.loom"))
