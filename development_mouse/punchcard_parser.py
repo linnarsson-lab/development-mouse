@@ -87,6 +87,7 @@ def parse_punchcard_require(punchcard_obj: Dict) -> List[luigi.Task]:
     The current version assumes that the input wil always be a WrapperTask
     """
     requirements: List[luigi.Task] = []
+    c = 0
     for i in range(len(punchcard_obj["require"])):
         requirement_entry = punchcard_obj["require"][i]
         requirement_type = requirement_entry["type"]
@@ -97,7 +98,11 @@ def parse_punchcard_require(punchcard_obj: Dict) -> List[luigi.Task]:
         if issubclass(Task, luigi.WrapperTask):
             requirements += list(Task(**requirement_kwargs).requires())
         else:
-            equirements += [Task(**requirement_kwargs)]
+            if c == 0:
+                requirements += [Task(**requirement_kwargs)]
+                c+=1
+            else:
+                requirements[-1].append(Task(**requirement_kwargs))
     return requirements
 
 

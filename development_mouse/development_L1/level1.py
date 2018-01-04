@@ -21,4 +21,6 @@ class Level1(luigi.WrapperTask):
         tissues = dm.targets_map[self.target]
         for tissue in tissues:
             if dm.time_check(tissue, self.time):
-                yield [dm.ClusterL1(tissue=tissue), dm.ExportL1(tissue=tissue)]  # NOTE this breaks all the the processes pipeline
+                yield dm.ClusterL1(tissue=tissue)
+                yield dm.ExportL1(tissue=tissue)
+                

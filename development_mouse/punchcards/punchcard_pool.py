@@ -34,7 +34,7 @@ class PunchcardPool(luigi.Task):  # Status: check the filter manager
 		logging.debug(f"Generating the pooled file {self.card}.loom")
 		with self.output().temporary_path() as out_file:
 			dsout: loompy.LoomConnection = None
-			# Try to drop the assumptio that
+			# Try to drop the assumption that
 			# clustering and the autoannotation are the i
 			for input_dict in self.input():
 				clustered, autoannotated = input_dict[0], input_dict[1]
