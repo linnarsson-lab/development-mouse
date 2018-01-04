@@ -24,7 +24,7 @@ require_type_dict = {"AggregatePunchcard": dm.AggregatePunchcard,
 class PunchcardParser(object):  # Status: needs to be run but looks ok
     def __init__(self, root: str = "../punchcards") -> None:
         # NOTE: root should be changed to a directory defined in a ~/.cytograph_rc file
-        self.root = root
+        self.root = os.path.abspath(root)
         self._analyses_dict = {}  # type: Dict
         self.model = {}  # type: Dict
         self._load_model()
