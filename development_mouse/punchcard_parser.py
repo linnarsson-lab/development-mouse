@@ -15,8 +15,7 @@ require_type_dict = {"AggregatePunchcard": dm.AggregatePunchcard,
                      "ExportPunchcard": dm.ExportPunchcard,
                      "ExportL1": dm.ExportL1,
                      "PunchcardPool": dm.PunchcardPool,
-                     "DiagnosticVelocityPunchcard": dm.DiagnosticVelocityPunchcard,
-                     "AggregatePunchcard": dm.EstimateVelocityPunchcard,
+                     "EstimateVelocityPunchcard": dm.EstimateVelocityPunchcard,
                      "VisualizeVelocityPunchcard": dm.VisualizeVelocityPunchcard,
                      "Level1": dm.Level1}
 
