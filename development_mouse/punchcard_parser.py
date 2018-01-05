@@ -117,13 +117,19 @@ def parse_punchcard_run(punchcard_obj: Dict) -> Iterator[luigi.Task]:
     if punchcard_obj["run"] is None:
         return None
     for task2run in punchcard_obj["run"]:
-        task_type, task_kwargs = task2run["type"], task2run["kwargs"]
-        if task_type not in safenames:
-            raise NotImplementedError(f"Task type: {task_type} not allowed, becouse is not a valid luigi task")
+        task_type = task2run["type"]
+        if "kwargs" in task2run:
+            task_kwargs = task2run["kwargs"]
         else:
-            Task_class = getattr(dm, task_type)  # eval("cg.%s" % analysis_type)
+            task_kwargs = {}
+        
+        Task_class = getattr(dm, task_type)  # Since I don't use eval anymore this is basically safe
 
-            def Task(card: Any) -> luigi.Task:
-                return Task_class(card, **task_kwargs)
-            
-            yield Task
+        assert issubclass(Task_class, luigi.Task) or issubclass(Task_class, luigi.WrapperTask), f"{task_type} is not valid Task name"
+
+        def Task(card: Any) -> luigi.Task:
+            d = {"card": card}
+            d.update(task_kwargs)
+            return Task_class(**task_kwargs)
+        
+        yield Task
