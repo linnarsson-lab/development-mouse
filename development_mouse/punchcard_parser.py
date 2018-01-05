@@ -130,6 +130,6 @@ def parse_punchcard_run(punchcard_obj: Dict) -> Iterator[luigi.Task]:
         def Task(card: Any) -> luigi.Task:
             d = {"card": card}
             d.update(task_kwargs)
-            return Task_class(**task_kwargs)
+            return Task_class(**d)
         
         yield Task
