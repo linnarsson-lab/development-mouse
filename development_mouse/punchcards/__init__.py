@@ -3,4 +3,6 @@ from .punchcard import Punchcard
 from .export_punchcard import ExportPunchcard
 from .aggregate_punchcard import AggregatePunchcard
 from .cluster_punchcard import ClusterPunchcard
-from .velocity_punchcard import DiagnosticVelocityPunchcard, EstimateVelocityPunchcard, VisualizeVelocityPunchcard
+from .estimate_velocity_punchcard import EstimateVelocityPunchcard
+from .visualize_velocity_punchcard import  VisualizeVelocityPunchcard
+# from .visualize_velocity import DiagnosticVelocityPunchcard

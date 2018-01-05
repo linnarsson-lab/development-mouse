@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import luigi
 
 
-class EstimateVelocityPunchcard(luigi.Task):
+class EstimateVelocity(luigi.Task):
     """Luigi Task to run velocyto
     """
     card = luigi.Parameter()
@@ -19,12 +19,11 @@ class EstimateVelocityPunchcard(luigi.Task):
         """
         Arguments
         ---------
-        `ClusterL1`:
+        `ClusterPunchcard`:
             passing ``card``
-        `AggregateL1`:
+        `AggregatePunchcard`:
             passing ``card``
         """
-        # NOTE: not sure it needs AggregateL1
         return [dm.ClusterPunchcard(card=self.card),
                 dm.AggregatePunchcard(card=self.card)]
 
@@ -32,13 +31,13 @@ class EstimateVelocityPunchcard(luigi.Task):
         """
         Returns
         -------
-        file: ``velocity_[card].hdf5``
+        file: ``velocity_[TISSUE].hdf5``
         """
-        return luigi.LocalTarget(os.path.join(dm.paths().build, f"velocity_{self.card}.hdf5"))
+        return luigi.LocalTarget(os.path.join(dm.paths().build, f"velocity_{self.tissue}.hdf5"))
 
     def run(self) -> None:
         """Run the velocity inference (without the projection on tsne) and generate the file:
-            velocity_[card].hdf5
+            velocity_[TISSUE].hdf5
         """
         logging = cg.logging(self, True)
         with self.output().temporary_path() as out_file:
