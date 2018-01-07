@@ -93,8 +93,7 @@ def parse_punchcard_require(punchcard_obj: Dict) -> List[luigi.Task]:
         requirement_kwargs = requirement_entry["kwargs"]
         Task = getattr(dm, requirement_type)
         if issubclass(Task, luigi.WrapperTask):
-            for requirement_list in Task(**requirement_kwargs).requires():
-                requirements.append(requirement_list)
+            requirements.append(Task(**requirement_kwargs).requires())
         else:
             assert issubclass(Task, luigi.Task), f"{requirement_type} is not valid Task name"
             if c == 0:
