@@ -9,15 +9,15 @@ from collections import defaultdict
 import copy
 
 # those are the analyses allowed, if a kind of analysis is not here cannot be run using the punchcard submodule
-require_type_dict = {"AggregatePunchcard": dm.AggregatePunchcard,
-                     "ClusterPunchcard": dm.ClusterPunchcard,
-                     "ClusterL1": dm.ClusterL1,
-                     "ExportPunchcard": dm.ExportPunchcard,
-                     "ExportL1": dm.ExportL1,
-                     "PunchcardPool": dm.PunchcardPool,
-                     "EstimateVelocityPunchcard": dm.EstimateVelocityPunchcard,
-                     "VisualizeVelocityPunchcard": dm.VisualizeVelocityPunchcard,
-                     "Level1": dm.Level1}
+# require_type_dict = {"AggregatePunchcard": dm.AggregatePunchcard,
+#                      "ClusterPunchcard": dm.ClusterPunchcard,
+#                      "ClusterL1": dm.ClusterL1,
+#                      "ExportPunchcard": dm.ExportPunchcard,
+#                      "ExportL1": dm.ExportL1,
+#                      "PunchcardPool": dm.PunchcardPool,
+#                      "EstimateVelocityPunchcard": dm.EstimateVelocityPunchcard,
+#                      "VisualizeVelocityPunchcard": dm.VisualizeVelocityPunchcard,
+#                      "Level1": dm.Level1}
 
 
 class PunchcardParser(object):  # Status: needs to be run but looks ok
@@ -91,13 +91,12 @@ def parse_punchcard_require(punchcard_obj: Dict) -> List[luigi.Task]:
         requirement_entry = punchcard_obj["require"][i]
         requirement_type = requirement_entry["type"]
         requirement_kwargs = requirement_entry["kwargs"]
-        if requirement_type not in require_type_dict:
-            raise NotImplementedError(f"Task type: {requirement_type} not allowed, you need to allow it adding it to require_type_dict")
-        Task = require_type_dict[requirement_type]
+        Task = getattr(dm, requirement_type)
         if issubclass(Task, luigi.WrapperTask):
             for requirement_list in Task(**requirement_kwargs).requires():
                 requirements.append(requirement_list)
         else:
+            assert issubclass(Task, luigi.Task), f"{requirement_type} is not valid Task name"
             if c == 0:
                 requirements.append([Task(**requirement_kwargs)])
                 c += 1
