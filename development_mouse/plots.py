@@ -90,6 +90,55 @@ def plot_abs_graph(ds: loompy.LoomConnection, dsagg: loompy.LoomConnection, out_
         plt.close()
 
 
+def plot_quality_graph(ds: loompy.LoomConnection, dsagg: loompy.LoomConnection, out_file: str=None, cluster_mapping: Dict[int, str]={}, tags: List[str] = None, ) -> None:
+    n_cells = ds.shape[1]
+    valid = ds.col_attrs["_Valid"].astype('bool')
+    
+    (a, b, w) = ds.get_edges("MKNN", axis=1)
+    mknn = sparse.coo_matrix((w, (a, b)), shape=(n_cells, n_cells)).tocsr()[valid, :][:, valid]
+    sfdp = np.vstack((ds.col_attrs["_X"], ds.col_attrs["_Y"])).transpose()[valid, :]
+    orderx = np.argsort(sfdp[:, 0], kind="mergesort")
+    ordery = np.argsort(sfdp[:, 1], kind="mergesort")
+    orderfin = orderx[ordery]
+    sfdp_original = sfdp.copy()
+    sfdp = sfdp[orderfin, :]
+    labels = ds.col_attrs["Clusters"][valid][orderfin]
+    quality = ds.col_attrs["QualityClass"].astype(float)[valid][orderfin]
+    
+    fig = plt.figure(figsize=(10, 10))
+    g = nx.from_scipy_sparse_matrix(mknn)
+    ax = fig.add_subplot(111)
+
+    nx.draw_networkx_edges(g, pos=sfdp_original, alpha=0.1, width=0.1, edge_color='gray')
+    block_colors = plt.cm.tab20(quality / np.max(quality))
+    nx.draw_networkx_nodes(g, pos=sfdp, node_color=block_colors, node_size=10, alpha=0.6, linewidths=0)
+
+    mg_pos = []
+    for lbl in range(0, max(labels) + 1):
+        if np.sum(labels == lbl) == 0:
+            continue
+        (x, y) = np.median(sfdp[np.where(labels == lbl)[0]], axis=0)
+        mg_pos.append((x, y))
+        text = "#" + str(lbl)
+        if len(tags[lbl]) > 0:
+            text += "\n" + tags[lbl]
+        ax.text(x, y, text, fontsize=8, weight="bold", bbox=dict(facecolor='gray', alpha=0.3, ec='none'))
+    ax.axis('off')
+    levels = np.unique(quality)
+    for il, lev in enumerate(levels):
+        ax.add_patch(
+            plt.Rectangle(
+                (0.90, 0.7 + il * 0.016), 0.014, 0.014,
+                color=plt.cm.tab20(lev / np.max(levels)),
+                clip_on=0, transform=ax.transAxes))
+        ax.text(0.93, 0.703 + il * 0.016, cluster_mapping[lev], transform=ax.transAxes)
+    plt.tight_layout()
+
+    if out_file is not None:
+        logging.info("Saving to file")
+        fig.savefig(out_file, format="png", dpi=250, bbox_inches='tight')
+        plt.close()
+
 def plot_velocity_summary(vlm: Any, confidence: np.ndarray, significant: np.ndarray, trans: np.ndarray,
                           expected_tr: np.ndarray, out_file: str=None, tags: List[str] = None) -> None:
     logging.info("Loading info from VelocytoLoom object")

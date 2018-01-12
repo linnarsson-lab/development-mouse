@@ -43,6 +43,9 @@ class ExportPunchcard(luigi.Task):
             tags = list(dsagg.col_attrs["AutoAnnotation"])
             cg.plot_graph(ds, os.path.join(out_dir, f"{self.card}_manifold.aa.png"), tags)
 
+            logging.info("Plotting manifold graph with auto-annotation, colored by age")
+            cg.plot_graph_age(ds, os.path.join(out_dir, f"{self.card}_manifold.age.png"), tags)
+
             logging.info(f"Plotting manifold graph with auto-auto-annotation for {self.card}")
             tags = list(dsagg.col_attrs["MarkerGenes"])
             cg.plot_graph(ds, os.path.join(out_dir, f"{self.card}_manifold.aaa.png"), tags)
