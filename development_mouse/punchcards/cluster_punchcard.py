@@ -100,7 +100,7 @@ class ClusterPunchcard(luigi.Task):  # Status: OK
                 ds.set_attr("Clusters", labels + 1, axis=1)
                 ds.set_attr("Outliers", (labels == -1).astype('int'), axis=1)
                 logging.info(f"Found {labels.max() + 1} clusters")
-                dsout.close()  
+                dsout.close()
             else:
                 dsout = loompy.connect(out_file)
                 ml = cg.ManifoldLearning(n_genes=self.n_genes, gtsne=self.gtsne, alpha=self.alpha, filter_cellcycle=self.filter_geneset, layer=self.layer)

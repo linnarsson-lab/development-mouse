@@ -139,6 +139,7 @@ def plot_quality_graph(ds: loompy.LoomConnection, dsagg: loompy.LoomConnection, 
         fig.savefig(out_file, format="png", dpi=250, bbox_inches='tight')
         plt.close()
 
+
 def plot_velocity_summary(vlm: Any, confidence: np.ndarray, significant: np.ndarray, trans: np.ndarray,
                           expected_tr: np.ndarray, out_file: str=None, tags: List[str] = None) -> None:
     logging.info("Loading info from VelocytoLoom object")
