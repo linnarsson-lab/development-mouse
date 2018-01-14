@@ -23,7 +23,7 @@ class ClusterPunchcard(luigi.Task):  # Status: OK
     """
     card = luigi.Parameter(description="Name of the punchcard to use")
     n_genes = luigi.IntParameter(default=1000, description="""(default=1000) The number of genes used in manifold learning""")
-    manifold_learning = luigi.IntParameter(default=1, description="int, default=1\nWhether to use `cytograph.ManifoldLearning` or `cytograph.ManifoldLearning2`")
+    manifold_learning = luigi.IntParameter(default=1, description="int, default=1\nWhether to use `cytograph.ManifoldLearning` or `cytograph.ManifoldLearning2`", always_in_help=True)
     gtsne = luigi.BoolParameter(default=True, description="(default=True) Use graph t-SNE for layout")
     alpha = luigi.FloatParameter(default=1, description="(default=1) The scale parameter for multiscale KNN")
     filter_geneset = luigi.Parameter(default=None, description="The path of a file containing as rows the gene symbol of genes to excluded (Note: despite the name it can be used for any gene set)")

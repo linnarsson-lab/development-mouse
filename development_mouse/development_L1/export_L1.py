@@ -14,8 +14,7 @@ import matplotlib.pyplot as plt
 class ExportL1(luigi.Task):
     """Luigi Task to autoannotate and export summary files
     """
-    tissue = luigi.Parameter(description="name of the tissue from tool specification file.",
-                             always_in_help=True)
+    tissue = luigi.Parameter(description="name of the tissue from tool specification file.")
 
     n_markers = luigi.IntParameter(default=10,
                                    description="number of markers visualized in the heatmap")
