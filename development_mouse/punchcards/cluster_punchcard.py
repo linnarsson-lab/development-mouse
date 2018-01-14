@@ -93,9 +93,7 @@ class ClusterPunchcard(luigi.Task):  # Status: OK
                 logging.info("Clustering on the manifold")
                 pl = cg.PolishedLouvain()
                 # This is for loompy1 For loompy2 just: labels = pl.fit_predict(dsout.col_graphs.MKNN, tsne)
-                a, b, w = ds.get_edges("MKNN", axis=1)
-                knn = sparse.coo_matrix((w, (a, b)), shape=(ds.shape[1], ds.shape[1]))
-                labels = pl.fit_predict(knn, tsne)
+                labels = pl.fit_predict(mknn, tsne)
 
                 ds.set_attr("Clusters", labels + 1, axis=1)
                 ds.set_attr("Outliers", (labels == -1).astype('int'), axis=1)
