@@ -130,6 +130,27 @@ class ClusterL1(luigi.Task):
                 cg.Merger(min_distance=0.2).merge(ds)
                 logging.info(f"Merged to {ds.col_attrs['Clusters'].max() + 1} clusters")
                 ds.close()
+            elif self.manifold_learning == 3:
+                logging.info("Learning the manifold")
+                ds = loompy.connect(out_file)
+                ml = cg.ManifoldLearning2(n_genes=self.n_genes, gtsne=self.gtsne, alpha=self.alpha, filter_cellcycle=self.filter_geneset, layer=self.layer)
+                (knn, mknn, tsne) = ml.fit(ds)
+                ds.set_edges("KNN", knn.row, knn.col, knn.data, axis=1)
+                ds.set_edges("MKNN", mknn.row, mknn.col, mknn.data, axis=1)
+                ds.set_attr("_X", tsne[:, 0], axis=1)
+                ds.set_attr("_Y", tsne[:, 1], axis=1)
+
+                logging.info("Clustering on the manifold")
+                pl = cg.PolishedLouvain()
+                # This is for loompy1 For loompy2 just: labels = pl.fit_predict(dsout.col_graphs.MKNN, tsne)
+                a, b, w = ds.get_edges("MKNN", axis=1)
+                knn = sparse.coo_matrix((w, (a, b)), shape=(ds.shape[1], ds.shape[1]))
+                labels = pl.fit_predict(knn, tsne)
+
+                ds.set_attr("Clusters", labels + 1, axis=1)
+                ds.set_attr("Outliers", (labels == -1).astype('int'), axis=1)
+                logging.info(f"Found {labels.max() + 1} clusters")
+                dsout.close()
             else:
                 dsout = loompy.connect(out_file)
                 ml = cg.ManifoldLearning(n_genes=self.n_genes, gtsne=self.gtsne, alpha=self.alpha, filter_cellcycle=self.filter_geneset, layer=self.layer)
@@ -142,8 +163,11 @@ class ClusterL1(luigi.Task):
 
                 min_pts = 10
                 eps_pct = 90
+                # Note dm.cluster().no_outliers is used only in the clustering dbscan and mknn_louvain
                 cls = cg.Clustering(method=dm.cluster().method, outliers=not dm.cluster().no_outliers, min_pts=min_pts, eps_pct=eps_pct)
                 labels = cls.fit_predict(dsout)
                 dsout.set_attr("Clusters", labels, axis=1)
-                n_labels = np.max(labels) + 1
+                if np.any(labels == -1):
+                    ds.set_attr("Outliers", (labels == -1).astype('int'), axis=1)
+                # n_labels = np.max(labels) + 1
                 dsout.close()
