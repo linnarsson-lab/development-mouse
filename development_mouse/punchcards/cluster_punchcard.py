@@ -103,7 +103,7 @@ class ClusterPunchcard(luigi.Task):  # Status: OK
             else:
                 ds = loompy.connect(out_file)
                 ml = cg.ManifoldLearning(n_genes=self.n_genes, gtsne=self.gtsne, alpha=self.alpha, filter_cellcycle=self.filter_geneset, layer=self.layer)
-                (knn, mknn, tsne) = ml.fit(dsout)
+                (knn, mknn, tsne) = ml.fit(ds)
 
                 ds.set_edges("KNN", knn.row, knn.col, knn.data, axis=1)
                 ds.set_edges("MKNN", mknn.row, mknn.col, mknn.data, axis=1)
@@ -113,7 +113,7 @@ class ClusterPunchcard(luigi.Task):  # Status: OK
                 min_pts = 10
                 eps_pct = 90
                 cls = cg.Clustering(method=dm.cluster().method, outliers=not dm.cluster().no_outliers, min_pts=min_pts, eps_pct=eps_pct)
-                labels = cls.fit_predict(dsout)
+                labels = cls.fit_predict(ds)
                 ds.set_attr("Clusters", labels, axis=1)
                 n_labels = np.max(labels) + 1
                 ds.close()
