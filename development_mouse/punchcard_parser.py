@@ -39,7 +39,7 @@ class PunchcardParser(object):  # Status: needs to be run but looks ok
                 continue
             for file in files:
                 if ((".yaml" == file[-5:]) or (".yml" == file[-4:])) and ("Model.yaml" not in file):
-                    temp_dict = yaml.load(open(os.path.join(self.root, file)))
+                    temp_dict = yaml.load(open(os.path.join(cur, file)))
                     name = temp_dict["abbreviation"]
                     model_copy = copy.deepcopy(self.model)
 
