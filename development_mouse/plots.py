@@ -230,3 +230,54 @@ def plot_velocity_summary(vlm: Any, confidence: np.ndarray, significant: np.ndar
         logging.info("Saving to file")
         fig.savefig(out_file, format="png", dpi=144, bbox_inches='tight')
         plt.close()
+
+
+def plot_punchcard_selection(ds: loompy.LoomConnection, out_file: str, filter_bool: np.ndarray) -> None:
+    n_cells = ds.shape[1]
+    cells = np.where(ds.col_attrs["_Valid"] == 1)[0]
+    pos = np.vstack((ds.col_attrs["_X"], ds.col_attrs["_Y"])).transpose()
+    labels = ds.col_attrs["Clusters"]
+    if "Outliers" in ds.col_attrs:
+        outliers = ds.col_attrs["Outliers"]
+    else:
+        outliers = np.zeros(ds.shape[1])
+        
+    # Compute a good size for the markers, based on local density
+    logging.info("Computing node size")
+    min_pts = 50
+    eps_pct = 60
+    nn = NearestNeighbors(n_neighbors=min_pts, algorithm="ball_tree", n_jobs=4)
+    nn.fit(pos)
+    knn = nn.kneighbors_graph(mode='distance')
+    k_radius = knn.max(axis=1).toarray()
+    epsilon = 24 * np.percentile(k_radius, eps_pct)
+
+    fig = plt.figure(figsize=(10, 10))
+    ax = fig.add_subplot(111)
+
+    # Draw nodes
+    logging.info("Drawing nodes")
+    colors20 = np.vstack((plt.cm.Vega20b(np.linspace(0., 1, 20))[::2], plt.cm.Vega20c(np.linspace(0, 1, 20))[1::2]))
+    plots = []
+    names = []
+    for i in range(max(labels) + 1):
+        cluster = labels == i
+        if np.all(outliers[labels == i] == 1):
+            edgecolor = colorConverter.to_rgba('red', alpha=.1)
+            plots.append(plt.scatter(x=pos[outliers == 1, 0], y=pos[outliers == 1, 1], c='grey', marker='.', edgecolors=edgecolor, alpha=0.1, s=epsilon))
+            names.append(str(i) + " (outliers)")
+        else:
+            plots.append(plt.scatter(x=pos[cluster & filter_bool, 0], y=pos[cluster & filter_bool, 1], c=colors20[np.mod(i, 20)], marker='.', lw=0, s=epsilon, alpha=0.8))
+            plots.append(plt.scatter(x=pos[cluster & (~filter_bool), 0], y=pos[cluster & (~filter_bool), 1], c=colors20[np.mod(i, 20)], marker='.', lw=0, s=epsilon, alpha=0.20))
+    
+    logging.info("Drawing cluster IDs")
+    for lbl in range(0, max(labels) + 1):
+        if np.all(outliers[labels == lbl] == 1):
+            continue
+        if np.sum(labels == lbl) == 0:
+            continue
+        (x, y) = np.median(pos[np.where(labels == lbl)[0]], axis=0)
+        ax.text(x, y, str(lbl), fontsize=12, bbox=dict(facecolor='white', alpha=0.5, ec='none'))
+    logging.info("Saving to file")
+    fig.savefig(out_file, format="png", dpi=144, bbox_inches='tight')
+    plt.close()
