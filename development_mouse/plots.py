@@ -268,7 +268,7 @@ def plot_punchcard_selection(ds: loompy.LoomConnection, out_file: str, filter_bo
             names.append(str(i) + " (outliers)")
         else:
             plots.append(plt.scatter(x=pos[cluster & filter_bool, 0], y=pos[cluster & filter_bool, 1], c=colors20[np.mod(i, 20)], marker='.', lw=0, s=epsilon, alpha=0.8))
-            plots.append(plt.scatter(x=pos[cluster & (~filter_bool), 0], y=pos[cluster & (~filter_bool), 1], c=colors20[np.mod(i, 20)], marker='.', lw=0, s=epsilon, alpha=0.20))
+            plots.append(plt.scatter(x=pos[cluster & (~filter_bool), 0], y=pos[cluster & (~filter_bool), 1], c="0.5", marker='.', lw=0, s=epsilon, alpha=0.20))
     
     logging.info("Drawing cluster IDs")
     for lbl in range(0, max(labels) + 1):
