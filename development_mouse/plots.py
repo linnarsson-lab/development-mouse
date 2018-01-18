@@ -274,14 +274,14 @@ def plot_punchcard_selection(ds: loompy.LoomConnection, out_file: str, filter_bo
     for lbl in range(0, max(labels) + 1):
         if np.all(outliers[labels == lbl] == 1):
             continue
-        if np.all(filter_bool[labels == lbl] == 1):
-            (x, y) = np.median(pos[np.where(labels == lbl)[0]], axis=0)
-            ax.text(x, y, str(lbl), fontsize=12, color='0.65', bbox=dict(facecolor='r', alpha=0.3, ec='none'))
-            continue
         if np.sum(labels == lbl) == 0:
             continue
-        (x, y) = np.median(pos[np.where(labels == lbl)[0]], axis=0)
-        ax.text(x, y, str(lbl), fontsize=12, bbox=dict(facecolor='g', alpha=0.3, ec='none'))
+        if np.all(filter_bool[labels == lbl]):
+            (x, y) = np.median(pos[np.where(labels == lbl)[0]], axis=0)
+            ax.text(x, y, str(lbl), fontsize=12, bbox=dict(facecolor='g', alpha=0.3, ec='none'))
+        else:
+            (x, y) = np.median(pos[np.where(labels == lbl)[0]], axis=0)
+            ax.text(x, y, str(lbl), fontsize=12, color='0.45', bbox=dict(facecolor='r', alpha=0.3, ec='none'))
     logging.info("Saving to file")
     fig.savefig(out_file, format="png", dpi=144, bbox_inches='tight')
     plt.close()
