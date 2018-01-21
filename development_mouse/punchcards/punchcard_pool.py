@@ -19,18 +19,19 @@ class PunchcardPool(luigi.Task):  # Status: check the filter manager
 	"""
 	
 	card = luigi.Parameter()
+	punchcard_deck = dm.PunchcardParser()
 
 	def requires(self) -> Iterator[luigi.Task]:
 		"""Parses the files in punchcard folder and returns required Tasks
 		"""
-		punchcard_obj = dm.PunchcardParser()[self.card]
+		punchcard_obj = self.punchcard_deck[self.card]
 		return dm.parse_punchcard_require(punchcard_obj)
 
 	def output(self) -> luigi.Target:
 		return luigi.LocalTarget(os.path.join(dm.paths().build, f"Pool_{self.card}.loom"))
 		
 	def run(self) -> None:
-		analysis_obj = dm.PunchcardParser()[self.card]
+		analysis_obj = self.punchcard_deck[self.card]
 		logging.debug(f"Generating the pooled file {self.card}.loom")
 		
 		with self.output().temporary_path() as out_file:
