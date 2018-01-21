@@ -52,17 +52,17 @@ class PunchcardParser(object):  # Status: needs to be run but looks ok
                                         try:
                                             model_copy[k][kk][kkk] = temp_dict[k][kk][kkk]
                                         except KeyError:
-                                            debug_msgs[name].append("Analysis %s `%s:%s:%s` was not found. The Default `%s` will be used" % (name, k, kk, kkk, model_copy[k][kk][kkk]))
+                                            debug_msgs[name].append("Punchcard %s `%s:%s:%s` was not found. The Default `%s` will be used" % (name, k, kk, kkk, model_copy[k][kk][kkk]))
                                 else:
                                     try:
                                         model_copy[k][kk] = temp_dict[k][kk]
                                     except KeyError:
-                                        debug_msgs[name].append("Analysis %s `%s:%s` was not found. The Default `%s` will be used" % (name, k, kk, model_copy[k][kk]))
+                                        debug_msgs[name].append("Punchcard %s `%s:%s` was not found. The Default `%s` will be used" % (name, k, kk, model_copy[k][kk]))
                         else:
                             try:
                                 model_copy[k] = temp_dict[k]
                             except KeyError:
-                                debug_msgs[name].append("Analysis %s `%s` was not found. The Default `%s` will be used" % (name, k, model_copy[k]))
+                                debug_msgs[name].append("Punchcard %s `%s` was not found. The Default `%s` will be used" % (name, k, model_copy[k]))
                     self._analyses_dict[name] = copy.deepcopy(model_copy)
                     self.debug_msgs = debug_msgs
 
