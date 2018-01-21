@@ -28,7 +28,7 @@ class PunchcardParser(object):  # Status: needs to be run but looks ok
         self.model = {}  # type: Dict
         self._load_model()
         self._load_defs()
-        self._has_printed = set()
+        self._has_printed: Set[str] = set()
 
     def _load_model(self) -> None:
         self.model = yaml.load(open(os.path.join(self.root, "Model.yaml")))

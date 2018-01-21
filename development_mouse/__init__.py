@@ -4,12 +4,12 @@ from .timepointwise import *
 from .development_L1 import *
 from .development import *
 from .development_L0 import *
+from .punchcard_parser import *
 from .punchcards import *
 from .velocity import *
 from .aga import *
 from .luigi_utils import *
 from .tests import *
-from .punchcard_parser import *
 from .cluster_config import cluster
 from .memory_config import memory
 from .threads_config import threads
