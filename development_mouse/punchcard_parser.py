@@ -28,6 +28,7 @@ class PunchcardParser(object):  # Status: needs to be run but looks ok
         self.model = {}  # type: Dict
         self._load_model()
         self._load_defs()
+        self._has_printed = set()
 
     def _load_model(self) -> None:
         self.model = yaml.load(open(os.path.join(self.root, "Model.yaml")))
@@ -75,8 +76,10 @@ class PunchcardParser(object):  # Status: needs to be run but looks ok
         return dict(self._analyses_dict)
 
     def __getitem__(self, key: Any) -> Dict:
-        for i in self.debug_msgs[key]:
-            logging.debug(i)
+        if not (key in self._has_printed):
+            for i in self.debug_msgs[key]:
+                logging.debug(i)
+            self._has_printed.add(key)
         return self._analyses_dict[key]
 
 
