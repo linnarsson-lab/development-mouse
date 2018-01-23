@@ -19,9 +19,10 @@ class Punchcard(luigi.WrapperTask):  # Status: check what it should return
 	"""
 	
 	card = luigi.Parameter(description="Name of the punchcard to run")
+	punchcard_deck = dm.PunchcardParser()
 
 	def requires(self) -> List[List[luigi.Task]]:
-		punchcard_obj = dm.PunchcardParser()[self.card]
+		punchcard_obj = self.punchcard_deck[self.card]
 		# To make it more general we can avoid to have ExportPunchcard as the first instance
 		other_tasks = []
 		tasks_list = dm.parse_punchcard_run(punchcard_obj)
