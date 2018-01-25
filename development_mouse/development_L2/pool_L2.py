@@ -59,7 +59,7 @@ class PoolL2(luigi.Task):
                             ca["Clusters"] = ds.col_attrs[key][selection - ix] + cluster_counter
                         else:
                             ca[key] = ds.col_attrs[key][selection - ix]
-                    ca["SourceFileName"] = np.full(ds.shape[0], os.path.basename(clusterP.fn))
+                    ca["SourceFileName"] = np.full(len(selection), os.path.basename(clusterP.fn))
 
                     # Add data to the loom file
                     if dsout is None:
