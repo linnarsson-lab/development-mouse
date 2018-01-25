@@ -48,16 +48,16 @@ class PoolL2(luigi.Task):
                 for (ix, selection, vals) in ds.batch_scan_layers(axis=1, batch_size=dm.memory().axis1):
                     m = {}
                     for layer_name, chunk_of_matrix in vals.items():
-                        m[layer_name] = vals[layer_name][order, :]  # NOTE I don't think I need this further sorting [:, selection - ix]
+                        m[layer_name] = vals[layer_name][order, :][:, selection - ix]  # NOTE I don't think I need this further sorting [:, selection - ix]
                     ca = {}
                     for key in ds.col_attrs:
                         if key == "Clusters":
                             # NOTE Special attention not to merge clusters
-                            ca["Clsters_original"] = ds.col_attrs[key]
+                            ca["Clsters_original"] = ds.col_attrs[key][:, selection - ix]
                             assert np.all(ds.col_attrs[key] != -1), "Some clusters are labeled -1 PoolL2 does not support that"
-                            ca["Clusters"] = ds.col_attrs[key] + cluster_counter
+                            ca["Clusters"] = ds.col_attrs[key][:, selection - ix] + cluster_counter
                         else:
-                            ca[key] = ds.col_attrs[key]
+                            ca[key] = ds.col_attrs[key][:, selection - ix]
                     ca["SourceFileName"] = np.full(ds.shape[0], os.path.basename(clusterP.fn))
 
                     # Add data to the loom file
