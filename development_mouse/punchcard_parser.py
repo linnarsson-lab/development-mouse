@@ -98,7 +98,7 @@ class PunchcardParser(object):  # Status: needs to be run but looks ok
             graph[i, j] = True
         # NOTE: I might have to deal with special case where I want to consider as a leaf a direct dependency from L1
         dont_have_child = graph.sum(1).A.flat[:] == 0
-        have_parent = graph.sum(0) > 0
+        have_parent = graph.sum(0).A.flat[:] > 0
         leaves_ixs = np.where(dont_have_child & have_parent)[0]
         leaves = list(punchcard_names[leaves_ixs])
         names_str = '\n'.join(leaves)
