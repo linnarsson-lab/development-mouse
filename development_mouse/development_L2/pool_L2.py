@@ -22,7 +22,6 @@ def ixs_thatsort_a2b(a: np.ndarray, b: np.ndarray, check_content: bool=True) -> 
 class PoolL2(luigi.Task):
     """Luigi Task to pool the leaves from punchcards tree
     """
-    tissue = luigi.Parameter()
     punchcard_deck = dm.PunchcardParser()
 
     def requires(self) -> List[luigi.Task]:
