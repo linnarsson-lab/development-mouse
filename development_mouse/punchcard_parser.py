@@ -3,8 +3,10 @@ import yaml
 import os
 import luigi
 import cytograph as cg
+import numpy as np
 import development_mouse as dm
 import logging
+from scipy import sparse
 from collections import defaultdict
 import copy
 
@@ -24,7 +26,7 @@ class PunchcardParser(object):  # Status: needs to be run but looks ok
     def __init__(self, root: str = "../punchcards") -> None:
         # NOTE: root should be changed to a directory defined in a ~/.cytograph_rc file
         self.root = os.path.abspath(root)
-        self._analyses_dict = {}  # type: Dict
+        self._punchcard_dict = {}  # type: Dict
         self.model = {}  # type: Dict
         self._load_model()
         self._load_defs()
@@ -64,23 +66,43 @@ class PunchcardParser(object):  # Status: needs to be run but looks ok
                                 model_copy[k] = temp_dict[k]
                             except KeyError:
                                 debug_msgs[name].append("Punchcard %s `%s` was not found. The Default `%s` will be used" % (name, k, model_copy[k]))
-                    self._analyses_dict[name] = copy.deepcopy(model_copy)
+                    self._punchcard_dict[name] = copy.deepcopy(model_copy)
                     self.debug_msgs = debug_msgs
 
     @property
     def all_analyses(self) -> List:
-        return list(self._analyses_dict.values())
+        return list(self._punchcard_dict.values())
 
     @property
-    def all_analyses_dict(self) -> Dict[str, Dict]:
-        return dict(self._analyses_dict)
+    def all_punchcard_dict(self) -> Dict[str, Dict]:
+        return dict(self._punchcard_dict)
 
     def __getitem__(self, key: Any) -> Dict:
         if not (key in self._has_printed):
             for i in self.debug_msgs[key]:
                 logging.debug(i)
             self._has_printed.add(key)
-        return self._analyses_dict[key]
+        return self._punchcard_dict[key]
+
+    def prune_leaves(self) -> List[str]:
+        punchcard_names = np.array(list(self._punchcard_dict.keys()))
+        n = punchcard_names.shape[0]
+        graph = sparse.lil_matrix((n, n), dtype=bool)
+        for i, key in enumerate(punchcard_names):
+            # Only one parent is allowed, to avoid redundances
+            task = self._punchcard_dict[key]["require"]
+            if len(task) > 1 or task["type"] != "Punchcard":
+                continue
+            j = np.where(punchcard_names == task["kwargs"]["card"])[0][0]
+            graph[i, j] = True
+        # NOTE: I might have to deal with special case where I want to consider as a leaf a direct dependency from L1
+        dont_have_child = graph.sum(1).A.flat[:] == 0
+        have_parent = graph.sum(0) > 0
+        leaves_ixs = np.where(dont_have_child & have_parent)[0]
+        leaves = list(punchcard_names[leaves_ixs])
+        names_str = '\n'.join(leaves)
+        logging.info(f"Pruned leaves:\n{names_str}")
+        return leaves
 
 
 def parse_punchcard_require(punchcard_obj: Dict) -> List[luigi.Task]:

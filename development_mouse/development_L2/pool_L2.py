@@ -1,0 +1,77 @@
+from typing import *
+import os
+import csv
+import numpy as np
+import pandas as pd
+import pickle
+import logging
+import luigi
+import cytograph as cg
+import development_mouse as dm
+import loompy
+import numpy.core.defchararray as npstr
+
+
+def ixs_thatsort_a2b(a: np.ndarray, b: np.ndarray, check_content: bool=True) -> np.ndarray:
+    "This is super duper magic sauce to make the order of one list to be like another"
+    if check_content:
+        assert len(np.intersect1d(a, b)) == len(a), f"The two arrays are not matching"
+    return np.argsort(a)[np.argsort(np.argsort(b))]
+
+
+class PoolL2(luigi.Task):
+    """Luigi Task to pool the leaves from punchcards tree
+    """
+    tissue = luigi.Parameter()
+    punchcard_deck = dm.PunchcardParser()
+
+    def requires(self) -> List[luigi.Task]:
+        leaves: List[str] = self.punchcard_deck.prune_leaves()
+        return [dm.Punchcard(card=l) for l in leaves]
+
+    def output(self) -> luigi.Target:
+        return luigi.LocalTarget(os.path.join(dm.paths().build, "L2_pool.loom"))
+
+    def run(self) -> None:
+        # Pooling the files
+        with self.output().temporary_path() as out_file:
+            dsout: loompy.LoomConnection = None
+            cluster_counter: int = 0
+            reference_accession = None
+            for punchcard in self.input():
+                clusterP, exportP, *_ = punchcard.requires()
+                ds = loompy.connect(clusterP.fn)
+        
+                reference_accession = ds.row_attrs["Accession"]
+                order = ixs_thatsort_a2b(ds.row_attrs["Accession"], reference_accession)
+
+                # NOTE: This could be done in much easier way with loompy2
+                for (ix, selection, vals) in ds.batch_scan_layers(axis=1, batch_size=dm.memory().axis1):
+                    m = {}
+                    for layer_name, chunk_of_matrix in vals.items():
+                        m[layer_name] = vals[layer_name][order, :]  # NOTE I don't think I need this further sorting [:, selection - ix]
+                    ca = {}
+                    for key in ds.col_attrs:
+                        if key == "Clusters":
+                            # NOTE Special attention not to merge clusters
+                            ca["Clsters_original"] = ds.col_attrs[key]
+                            assert np.all(ca[key] != -1), "Some clusters are labeled -1 PoolL2 does not support that"
+                            ca["Clusters"] = ds.col_attrs[key] + cluster_counter
+                        else:
+                            ca[key] = ds.col_attrs[key]
+                    ca["SourceFileName"] = np.full(ds.shape[0], os.path.basename(clusterP.fn))
+
+                    # Add data to the loom file
+                    if dsout is None:
+                        # create using main layer
+                        dsout = loompy.create(out_file, m[""], ds.row_attrs, ca)
+                        # Add layers
+                        for layer_name, chunk_of_matrix in m.items():
+                            if layer_name == "":
+                                continue
+                            dsout.set_layer(layer_name, chunk_of_matrix, dtype=chunk_of_matrix.dtype)
+                    else:
+                        dsout.add_columns(m, ca)
+                ds.close()
+                cluster_counter = np.max(dsout.col_attrs["Clusters"]) + 1
+            dsout.close()
