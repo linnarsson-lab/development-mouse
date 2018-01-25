@@ -37,7 +37,6 @@ class PoolL2(luigi.Task):
             dsout: loompy.LoomConnection = None
             cluster_counter: int = 0
             reference_accession = None
-            print(self.input())
             for punchcard in self.input():
                 clusterP, exportP, *_ = punchcard  # It is confusing but it seems to not need .requires()
                 ds = loompy.connect(clusterP.fn)
@@ -55,7 +54,7 @@ class PoolL2(luigi.Task):
                         if key == "Clusters":
                             # NOTE Special attention not to merge clusters
                             ca["Clsters_original"] = ds.col_attrs[key]
-                            assert np.all(ca[key] != -1), "Some clusters are labeled -1 PoolL2 does not support that"
+                            assert np.all(ds.col_attrs[key] != -1), "Some clusters are labeled -1 PoolL2 does not support that"
                             ca["Clusters"] = ds.col_attrs[key] + cluster_counter
                         else:
                             ca[key] = ds.col_attrs[key]
