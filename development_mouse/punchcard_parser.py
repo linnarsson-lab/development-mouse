@@ -90,9 +90,10 @@ class PunchcardParser(object):  # Status: needs to be run but looks ok
         graph = sparse.lil_matrix((n, n), dtype=bool)
         for i, key in enumerate(punchcard_names):
             # Only one parent is allowed, to avoid redundances
-            task = self._punchcard_dict[key]["require"]
-            if len(task) > 1 or task["type"] != "Punchcard":
+            tasks = self._punchcard_dict[key]["require"]
+            if len(tasks) > 1 or tasks[0]["type"] != "Punchcard":
                 continue
+            task = tasks[0]
             j = np.where(punchcard_names == task["kwargs"]["card"])[0][0]
             graph[i, j] = True
         # NOTE: I might have to deal with special case where I want to consider as a leaf a direct dependency from L1
