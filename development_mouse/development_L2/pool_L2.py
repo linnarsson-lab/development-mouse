@@ -49,7 +49,7 @@ class PoolL2(luigi.Task):
                 for (ix, selection, vals) in ds.batch_scan_layers(axis=1, batch_size=dm.memory().axis1):
                     m = {}
                     for layer_name, chunk_of_matrix in vals.items():
-                        m[layer_name] = vals[layer_name][order, :][:, selection - ix]
+                        m[layer_name] = vals[layer_name][order, :]  # NOTE: I think this is not needed since there is no selection  [:, selection - ix]
                     # NOTE: I don't need to do it this way I can do it outside the loop
                     ca = {}
                     for key in ds.col_attrs:
