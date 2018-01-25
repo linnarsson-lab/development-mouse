@@ -26,7 +26,7 @@ class PoolL2(luigi.Task):
 
     def requires(self) -> List[luigi.Task]:
         leaves: List[str] = self.punchcard_deck.prune_leaves()
-        return [dm.Punchcard(card=l) for l in leaves]
+        return [dm.Punchcard(card=l).requires() for l in leaves]
 
     def output(self) -> luigi.Target:
         return luigi.LocalTarget(os.path.join(dm.paths().build, "L2_pool.loom"))
