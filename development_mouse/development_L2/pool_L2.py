@@ -37,6 +37,7 @@ class PoolL2(luigi.Task):
             dsout: loompy.LoomConnection = None
             cluster_counter: int = 0
             reference_accession = None
+            print(self.input())
             for punchcard in self.input():
                 clusterP, exportP, *_ = punchcard  # It is confusing but it seems to not need .requires()
                 ds = loompy.connect(clusterP.fn)
