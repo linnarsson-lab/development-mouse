@@ -38,7 +38,7 @@ class PoolL2(luigi.Task):
             cluster_counter: int = 0
             reference_accession = None
             for punchcard in self.input():
-                clusterP, exportP, *_ = punchcard.requires()
+                clusterP, exportP, *_ = punchcard  # It is confusing but it seems to not need .requires()
                 ds = loompy.connect(clusterP.fn)
         
                 reference_accession = ds.row_attrs["Accession"]
