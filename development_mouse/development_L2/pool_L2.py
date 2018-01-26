@@ -58,7 +58,11 @@ class PoolL2(luigi.Task):
                             ca["Clusters_original"] = ds.col_attrs[key][selection - ix]
                             ca["Clusters"] = ds.col_attrs[key][selection - ix] + cluster_counter
                         else:
-                            ca[key] = ds.col_attrs[key][selection - ix]
+                            if ds.col_attrs[key].dtype.type is np.str_:
+                                # Avoid a bug that determines some trimming
+                                ca[key] = ds.col_attrs[key][selection - ix].astype("<U100")
+                            else:
+                                ca[key] = ds.col_attrs[key][selection - ix]
                     ca["SourceFileName"] = np.full(len(selection), os.path.basename(clusterP.fn))
 
                     # Add data to the loom file
