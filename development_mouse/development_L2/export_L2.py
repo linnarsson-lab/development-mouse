@@ -4,7 +4,6 @@ import logging
 import loompy
 from scipy import sparse
 import numpy as np
-import networkx as nx
 import cytograph as cg
 import development_mouse as dm
 import luigi
@@ -35,6 +34,7 @@ class ExportL2(luigi.Task):
             dsagg.export(os.path.join(out_dir, "PoolL2_enrichment_q.tab"), layer="enrichment_q")
             dsagg.export(os.path.join(out_dir, "PoolL2_trinaries.tab"), layer="trinaries")
 
+            dm.plot_dendrogram(dsag)
             # ds = loompy.connect(self.requires().input().fn)
             # logging.info(f"Plotting marker heatmap for {self.card}")
             # cg.plot_markerheatmap(ds, dsagg, n_markers_per_cluster=self.n_markers, out_file=os.path.join(out_dir, f"{self.card}_heatmap.pdf"))

@@ -34,8 +34,8 @@ class ClusterL1(luigi.Task):
     manifold_learning = luigi.IntParameter(default=1, description="(default=1) Whether to use `cytograph.ManifoldLearning` or `cytograph.ManifoldLearning2`")
     gtsne = luigi.BoolParameter(default=True, description="(default=True) Use graph t-SNE for layout")
     alpha = luigi.FloatParameter(default=1, description="(default=1) The scale parameter for multiscale KNN")
-    filter_geneset = luigi.Parameter(default=None, description="(path) The path of a file containing as rows the gene symbol of genes to excluded (Note: despite the name it can be used for any gene set)")
-    layer = luigi.Parameter(default=None, description="Layer used for manifold learning (i.e. the matrix used to compute PCA). Currently it only has effects when using `cytograph.ManifoldLearning` and not `cytograph.ManifoldLearning2`")
+    filter_geneset = luigi.Parameter(default="None", description="(path) The path of a file containing as rows the gene symbol of genes to excluded (Note: despite the name it can be used for any gene set)")
+    layer = luigi.Parameter(default="None", description="Layer used for manifold learning (i.e. the matrix used to compute PCA). Currently it only has effects when using `cytograph.ManifoldLearning` and not `cytograph.ManifoldLearning2`")
 
     def requires(self) -> luigi.Task:
         return {"PrepareTissuePool": dm.PrepareTissuePool(tissue=self.tissue),
@@ -67,6 +67,10 @@ class ClusterL1(luigi.Task):
         memory_batch: `memory_config.memory.batch`, default=2000
             The size of the batches that are used by `cytograph.batch_scan_layers`
         """
+        if self.filter_geneset == "None":
+            self.filter_geneset = None
+        if self.layer == "None":
+            self.layer = None
         logging = cg.logging(self)
         with self.output().temporary_path() as out_file:
             ds = loompy.connect(self.input()["PrepareTissuePool"].fn)

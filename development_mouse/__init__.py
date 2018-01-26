@@ -1,6 +1,7 @@
 from .path_config import paths
 from .plots import *
 from .timepointwise import *
+from .dendrogram import *
 from .development_L1 import *
 from .development import *
 from .development_L0 import *

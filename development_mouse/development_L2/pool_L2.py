@@ -29,7 +29,7 @@ class PoolL2(luigi.Task):
         return [dm.Punchcard(card=l).requires() for l in leaves]
 
     def output(self) -> luigi.Target:
-        return luigi.LocalTarget(os.path.join(dm.paths().build, "L2_pool.loom"))
+        return luigi.LocalTarget(os.path.join(dm.paths().build, "PoolL2.loom"))
 
     def run(self) -> None:
         # Pooling the files

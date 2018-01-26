@@ -1,8 +1,6 @@
 from typing import *
 import os
-import csv
 import logging
-import pickle
 import loompy
 import numpy as np
 import cytograph as cg
