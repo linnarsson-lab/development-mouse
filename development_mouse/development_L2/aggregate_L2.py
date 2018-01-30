@@ -28,11 +28,12 @@ class AggregateL2(luigi.Task):  # Status: Ok
 			cg.Aggregator(self.n_markers).aggregate(ds, out_file)
 			dsagg = loompy.connect(out_file)
 
-			logging.info("Computing auto-annotation")
+			logging.info("Computing auto-annotation of L2 Pool")
 			aa = cg.AutoAnnotator(root=dm.paths().autoannotation)
 			aa.annotate_loom(dsagg)
 			aa.save_in_loom(dsagg)
 			
+            ds.close()
 			# logging.info("Computing auto-auto-annotation")
 			# n_clusters = dsagg.shape[1]
 			# (selected, selectivity, specificity, robustness) = cg.AutoAutoAnnotator(n_genes=self.n_auto_genes).fit(dsagg)

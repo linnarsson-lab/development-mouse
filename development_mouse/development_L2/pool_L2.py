@@ -55,7 +55,9 @@ class PoolL2(luigi.Task):
                     # NOTE: I don't need to do it this way I can do it outside the loop
                     ca = {}
                     for key in ds.col_attrs:
-                        if key == "Clusters":
+                        if key == "Clusters_original":
+                            pass
+                        elif key == "Clusters":
                             # NOTE Special attention not to merge clusters
                             ca["Clusters_original"] = ds.col_attrs[key][selection]
                             ca["Clusters"] = ds.col_attrs[key][selection] + cluster_counter
