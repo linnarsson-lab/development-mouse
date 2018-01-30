@@ -33,13 +33,13 @@ class AggregateL2(luigi.Task):  # Status: Ok
 			aa.annotate_loom(dsagg)
 			aa.save_in_loom(dsagg)
 			
-			logging.info("Computing auto-auto-annotation")
-			n_clusters = dsagg.shape[1]
-			(selected, selectivity, specificity, robustness) = cg.AutoAutoAnnotator(n_genes=self.n_auto_genes).fit(dsagg)
-			dsagg.set_attr("MarkerGenes", np.array([" ".join(ds.row_attrs["Gene"][selected[:, ix]]) for ix in np.arange(n_clusters)]), axis=1)
-			ds.close()
-			np.set_printoptions(precision=1, suppress=True)
-			dsagg.set_attr("MarkerSelectivity", np.array([str(selectivity[:, ix]) for ix in np.arange(n_clusters)]), axis=1)
-			dsagg.set_attr("MarkerSpecificity", np.array([str(specificity[:, ix]) for ix in np.arange(n_clusters)]), axis=1)
-			dsagg.set_attr("MarkerRobustness", np.array([str(robustness[:, ix]) for ix in np.arange(n_clusters)]), axis=1)
-			dsagg.close()
+			# logging.info("Computing auto-auto-annotation")
+			# n_clusters = dsagg.shape[1]
+			# (selected, selectivity, specificity, robustness) = cg.AutoAutoAnnotator(n_genes=self.n_auto_genes).fit(dsagg)
+			# dsagg.set_attr("MarkerGenes", np.array([" ".join(ds.row_attrs["Gene"][selected[:, ix]]) for ix in np.arange(n_clusters)]), axis=1)
+			# ds.close()
+			# np.set_printoptions(precision=1, suppress=True)
+			# dsagg.set_attr("MarkerSelectivity", np.array([str(selectivity[:, ix]) for ix in np.arange(n_clusters)]), axis=1)
+			# dsagg.set_attr("MarkerSpecificity", np.array([str(specificity[:, ix]) for ix in np.arange(n_clusters)]), axis=1)
+			# dsagg.set_attr("MarkerRobustness", np.array([str(robustness[:, ix]) for ix in np.arange(n_clusters)]), axis=1)
+			# dsagg.close()
