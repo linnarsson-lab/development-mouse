@@ -42,6 +42,7 @@ class PunchcardParser(object):  # Status: needs to be run but looks ok
                 continue
             for file in files:
                 if ((".yaml" == file[-5:]) or (".yml" == file[-4:])) and ("Model.yaml" not in file):
+                    logging.debug(f"Reading {os.path.join(cur, file)}")
                     temp_dict = yaml.load(open(os.path.join(cur, file)))
                     name = temp_dict["abbreviation"]
                     model_copy = copy.deepcopy(self.model)
@@ -67,7 +68,7 @@ class PunchcardParser(object):  # Status: needs to be run but looks ok
                             except KeyError:
                                 debug_msgs[name].append("Punchcard %s `%s` was not found. The Default `%s` will be used" % (name, k, model_copy[k]))
                     self._punchcard_dict[name] = copy.deepcopy(model_copy)
-                    self.debug_msgs = debug_msgs
+        self.debug_msgs = debug_msgs
 
     @property
     def all_analyses(self) -> List:
