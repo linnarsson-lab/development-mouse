@@ -40,8 +40,9 @@ class PoolL2(luigi.Task):
             for punchcard in self.input():
                 clusterP, exportP, *_ = punchcard  # It is confusing but it seems to not need .requires()
                 ds = loompy.connect(clusterP.fn)
-        
-                reference_accession = ds.row_attrs["Accession"]
+
+                if reference_accession is None:
+                    reference_accession = ds.row_attrs["Accession"]
                 order = ixs_thatsort_a2b(ds.row_attrs["Accession"], reference_accession)
 
                 assert np.all(ds.col_attrs["Clusters"] != -1), "Some clusters are labeled -1 PoolL2 does not support that"
