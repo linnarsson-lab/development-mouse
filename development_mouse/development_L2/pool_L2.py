@@ -39,6 +39,7 @@ class PoolL2(luigi.Task):
             reference_accession = None
             for punchcard in self.input():
                 clusterP, exportP, *_ = punchcard  # It is confusing but it seems to not need .requires()
+                logging.debug(f"Connecting to {clusterP.fn} to merge it to PoolL2.loom")
                 ds = loompy.connect(clusterP.fn)
 
                 if reference_accession is None:
