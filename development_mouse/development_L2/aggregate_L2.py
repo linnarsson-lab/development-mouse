@@ -25,10 +25,11 @@ class AggregateL2(luigi.Task):  # Status: Ok
         logging = cg.logging(self)
         with self.output().temporary_path() as out_file:
             ds = loompy.connect(self.input().fn)
+            logging.info("Aggregating L2 Pool")
             cg.Aggregator(self.n_markers).aggregate(ds, out_file)
             dsagg = loompy.connect(out_file)
 
-            logging.info("Computing auto-annotation of L2 Pool")
+            logging.info("Computing auto-annotation of L2 Pool Aggregated")
             aa = cg.AutoAnnotator(root=dm.paths().autoannotation)
             aa.annotate_loom(dsagg)
             aa.save_in_loom(dsagg)
