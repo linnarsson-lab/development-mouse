@@ -81,11 +81,7 @@ class PunchcardPool(luigi.Task):  # Status: check the filter manager
                             ca["Clusters_original"] = ds.col_attrs[key][subset]
                             ca[key] = ds.col_attrs[key][subset] + cluster_counter
                         else:
-                            if ds.col_attrs[key].dtype.type is np.str_:
-                                # Avoid a bug that determines some trimming
-                                ca[key] = ds.col_attrs[key][subset].astype("<U100")
-                            else:
-                                ca[key] = ds.col_attrs[key][subset]
+                            ca[key] = ds.col_attrs[key][subset]
                             
                     # Add data to the loom file
                     if dsout is None:

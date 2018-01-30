@@ -57,10 +57,10 @@ class PoolL2(luigi.Task):
                     for key in ds.col_attrs:
                         if key == "Clusters":
                             # NOTE Special attention not to merge clusters
-                            ca["Clusters_original"] = ds.col_attrs[key][selection - ix]
-                            ca["Clusters"] = ds.col_attrs[key][selection - ix] + cluster_counter
+                            ca["Clusters_original"] = ds.col_attrs[key][selection]
+                            ca["Clusters"] = ds.col_attrs[key][selection] + cluster_counter
                         else:
-                            ca[key] = ds.col_attrs[key][selection - ix]
+                            ca[key] = ds.col_attrs[key][selection]
                     ca["SourceFileName"] = np.full(len(selection), os.path.basename(clusterP.fn))
 
                     # Add data to the loom file
