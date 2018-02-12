@@ -53,7 +53,8 @@ class PrepareTissuePool(luigi.Task):
 
 				logging.info("Marking invalid cells")
 				(mols, genes) = ds.map([np.sum, np.count_nonzero], axis=1)
-				valid_cells.append(np.logical_and(mols >= 600, (mols / genes) >= 1.2).astype('int'))
+				# NOTE change made fro indrops 
+				valid_cells.append(np.logical_and((mols >= 600) & (mols <= 15000), (mols / genes) >= 1.2).astype('int'))
 				ds.set_attr("_Total", mols, axis=1)
 				ds.set_attr("_NGenes", genes, axis=1)
 				
