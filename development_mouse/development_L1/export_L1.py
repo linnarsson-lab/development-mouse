@@ -29,8 +29,7 @@ class ExportL1(luigi.Task):
             passing ``tissue``
         """
         return {f"AbstractL1(tissue={self.tissue})": dm.AbstractL1(tissue=self.tissue),
-                f"ClusterL1(tissue={self.tissue})": dm.ClusterL1(tissue=self.tissue),
-                "NameQualityClusters": dm.NameQualityClusters()}
+                f"ClusterL1(tissue={self.tissue})": dm.ClusterL1(tissue=self.tissue)}
 
     def output(self) -> luigi.Target:
         """
@@ -86,17 +85,17 @@ class ExportL1(luigi.Task):
             logging.info("Plotting marker heatmap")
             cg.plot_markerheatmap(ds, dsagg, n_markers_per_cluster=self.n_markers, out_file=os.path.join(out_dir, f"L1_{self.tissue}_heatmap.pdf"))
 
-            logging.info("Plotting quality class on t-SNE")
-            tags = list(dsagg.col_attrs["AutoAnnotation"])
-            cluster_mapping = {int(i.split(":")[0]): i.split(":")[1] for i in open(self.input()["NameQualityClusters"].fn).read().rstrip().split()}
-            dm.plot_quality_graph(ds, dsagg, out_file=os.path.join(out_dir, f"L1_{self.tissue}_quality_tsne.png"),
-                                  cluster_mapping=cluster_mapping, tags=tags)
+            #logging.info("Plotting quality class on t-SNE")
+            #tags = list(dsagg.col_attrs["AutoAnnotation"])
+            #cluster_mapping = {int(i.split(":")[0]): i.split(":")[1] for i in open(self.input()["NameQualityClusters"].fn).read().rstrip().split()}
+            #dm.plot_quality_graph(ds, dsagg, out_file=os.path.join(out_dir, f"L1_{self.tissue}_quality_tsne.png"),
+            #                      cluster_mapping=cluster_mapping, tags=tags)
                     
-            logging.info("Plotting quality class in pie chart")
-            plt.figure(None, (10, 10))
-            labels = ds.col_attrs["QualityClass"].astype(int)
-            unique, counts = np.unique(labels, return_counts=True)
-            labelnames = [cluster_mapping[ix] for ix in unique]
-            patches, texts = plt.pie(counts)
-            plt.legend(patches, labelnames, bbox_to_anchor=(0.1, 1), fontsize=15)
-            plt.savefig(os.path.join(out_dir, "L1_" + self.tissue + "_quality_pie.png"))
+            # logging.info("Plotting quality class in pie chart")
+            # plt.figure(None, (10, 10))
+            # labels = ds.col_attrs["QualityClass"].astype(int)
+            # unique, counts = np.unique(labels, return_counts=True)
+            # labelnames = [cluster_mapping[ix] for ix in unique]
+            # patches, texts = plt.pie(counts)
+            # plt.legend(patches, labelnames, bbox_to_anchor=(0.1, 1), fontsize=15)
+            # plt.savefig(os.path.join(out_dir, "L1_" + self.tissue + "_quality_pie.png"))
