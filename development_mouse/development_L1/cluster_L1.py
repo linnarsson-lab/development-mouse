@@ -38,9 +38,7 @@ class ClusterL1(luigi.Task):
     layer = luigi.Parameter(default="None", description="Layer used for manifold learning (i.e. the matrix used to compute PCA). Currently it only has effects when using `cytograph.ManifoldLearning` and not `cytograph.ManifoldLearning2`")
 
     def requires(self) -> luigi.Task:
-        return {"PrepareTissuePool": dm.PrepareTissuePool(tissue=self.tissue),
-                "NameQualityClusters": dm.NameQualityClusters(),
-                "MakeQualityClassifier": dm.MakeQualityClassifier()}
+        return {"PrepareTissuePool": dm.PrepareTissuePool(tissue=self.tissue)}
 
     def output(self) -> luigi.Target:
         """
@@ -76,22 +74,22 @@ class ClusterL1(luigi.Task):
             ds = loompy.connect(self.input()["PrepareTissuePool"].fn)
             dsout: loompy.LoomConnection = None
 
-            logging.info("Deserializing QC Classifier")
-            knc: KNeighborsClassifier = pickle.load(open(os.path.join(self.input()["MakeQualityClassifier"].fn, "QC_Classifier.pickle"), "rb"))
-            logging.info("Reading NameQualityCluster file")
+            #logging.info("Deserializing QC Classifier")
+            #knc: KNeighborsClassifier = pickle.load(open(os.path.join(self.input()["MakeQualityClassifier"].fn, "QC_Classifier.pickle"), "rb"))
+            #logging.info("Reading NameQualityCluster file")
             # cluster_mapping = {int(i.split(":")[0]): i.split(":")[1] for i in open(self.input()["NameQualityClusters"].fn).read().rstrip().split()}
-            initial_cell_size = ds.col_attrs["SplicedTotal"]
-            initial_Ucell_size = ds.col_attrs["UnsplicedTotal"]
-            detected_genes = ds.col_attrs["TotalMolNoAmbiguous"]
-            mito_size = ds.col_attrs["MitocondrialTotal"]
-            ribo_size = ds.col_attrs["RibosomalTotal"]
-            X = np.column_stack((initial_cell_size, initial_Ucell_size, detected_genes, mito_size, ribo_size))
-            X_log = np.log2(X + 1)
+            #initial_cell_size = ds.col_attrs["SplicedTotal"]
+            #initial_Ucell_size = ds.col_attrs["UnsplicedTotal"]
+            #detected_genes = ds.col_attrs["TotalMolNoAmbiguous"]
+            #mito_size = ds.col_attrs["MitocondrialTotal"]
+            #ribo_size = ds.col_attrs["RibosomalTotal"]
+            #X = np.column_stack((initial_cell_size, initial_Ucell_size, detected_genes, mito_size, ribo_size))
+            #X_log = np.log2(X + 1)
 
-            logging.info("Using the QC Classifier to set QualityClass")
-            predicted = knc.predict(X_log)
+            #logging.info("Using the QC Classifier to set QualityClass")
+            #predicted = knc.predict(X_log)
             # qc_luster_labels = np.array([cluster_mapping[i] for i in predicted])
-            ds.set_attr(name="QualityClass", values=predicted, axis=1)
+            #ds.set_attr(name="QualityClass", values=predicted, axis=1)
 
             # NOTE for now the quality class is only written and not used anywhere
 

@@ -238,4 +238,4 @@ SampleID	Pool	TimepointPool	QC	Project
 10X81_2	Enteric	none	OK	Adolescent
 10X81_3	Enteric	none	OK	Adolescent
 10X82_2	Enteric	none	OK	Adolescent
-combined_visual_cortex	VisualCortex	none	OK	Indrops
+filtered_combined_visual_cortex	VisualCortex	none	OK	Indrops
