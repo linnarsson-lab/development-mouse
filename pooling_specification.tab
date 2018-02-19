@@ -240,3 +240,11 @@ SampleID	Pool	TimepointPool	QC	Project
 10X82_2	Enteric	none	OK	Adolescent
 filtered_combined_visual_cortex	VisualCortex	none	OK	Indrops
 combined_visual_cortex	VisualCortexFull	none	OK	Indrops
+Astrocytes	Astrocytes	none	OK	Indrops
+Endothelial_SmoothMuscle	Endothelial_SmoothMuscle	none	FAILED	Indrops
+Excitatory	Excitatory	none	OK	Indrops
+Interneurons	Interneurons	none	OK	Indrops
+Macrophages	Macrophages	none	OK	Indrops
+Microglia	Microglia	none	OK	Indrops
+Mural	Mural	none	OK	Indrops
+Oligodendrocytes	Oligodendrocytes	none	OK	Indrops
