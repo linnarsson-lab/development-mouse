@@ -241,7 +241,7 @@ SampleID	Pool	TimepointPool	QC	Project
 filtered_combined_visual_cortex	VisualCortex	none	OK	Indrops
 combined_visual_cortex	VisualCortexFull	none	OK	Indrops
 Astrocytes	Astrocytes	none	OK	Indrops
-Endothelial_SmoothMuscle	Endothelial_SmoothMuscle	none	FAILED	Indrops
+Endothelial_SmoothMuscle	Endothelial_SmoothMuscle	none	OK	Indrops
 Excitatory	Excitatory	none	OK	Indrops
 Interneurons	Interneurons	none	OK	Indrops
 Macrophages	Macrophages	none	OK	Indrops
