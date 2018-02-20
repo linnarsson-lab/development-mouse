@@ -245,6 +245,10 @@ Endothelial_SmoothMuscle	Endothelial_SmoothMuscle	none	OK	Indrops
 Excitatory	Excitatory	none	OK	Indrops
 Interneurons	Interneurons	none	OK	Indrops
 Macrophages	Macrophages	none	OK	Indrops
+Macrophages	Macrophages	none	OK	Indrops
 Microglia	Microglia	none	OK	Indrops
 Mural	Mural	none	OK	Indrops
 Oligodendrocytes	Oligodendrocytes	none	OK	Indrops
+L1_Excitatory_filtered	Excitatory_clean	none	OK	Indrops
+L1_Oligodendrocytes_filtered	Oligodendrocytes_clean	none	OK	Indrops
+L1_Interneurons_filtered	Interneurons_clean	none	OK	Indrops
