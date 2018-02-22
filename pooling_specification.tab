@@ -250,5 +250,6 @@ Microglia	Microglia	none	OK	Indrops
 Mural	Mural	none	OK	Indrops
 Oligodendrocytes	Oligodendrocytes	none	OK	Indrops
 L1_Excitatory_filtered	Excitatory_clean	none	OK	Indrops
-L1_Oligodendrocytes_filtered	Oligodendrocytes_clean	none	OK	Indrops
+Oligodendrocytes_filtered	Oligodendrocytes_clean	none	OK	Indrops
+L1filter_ExcL23	ExcL23	none	OK	Indrops
 L1_Interneurons_filtered	Interneurons_clean	none	OK	Indrops
