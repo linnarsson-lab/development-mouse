@@ -99,15 +99,14 @@ class ClusterL1(luigi.Task):
             for (ix, selection, vals) in ds.batch_scan_layers(cells=np.where(ds.col_attrs["_Valid"] == 1)[0], layers=ds.layer.keys(), batch_size=dm.memory().axis1, axis=1):
                 ca = {key: val[selection] for key, val in ds.col_attrs.items()}
                 if dsout is None:
-                    # NOTE Loompy Create should support multilayer !!!!
                     if type(vals) is dict:
-                        dsout = loompy.create(out_file, vals[""], row_attrs=ds.row_attrs, col_attrs=ca, dtype=vals[""].dtype)
+                        dsout = loompy.create(out_file, vals[""], row_attrs=ds.ra, col_attrs=ca)
+                        dsout = loompy.connect(out_file)
                         for layername, layervalues in vals.items():
                             if layername != "":
-                                dsout.set_layer(layername, layervalues, dtype=layervalues.dtype)
-                        dsout = loompy.connect(out_file)
+                                dsout.layers[layername] = layervalues
                     else:
-                        loompy.create(out_file, vals, row_attrs=ds.row_attrs, col_attrs=ca)
+                        loompy.create(out_file, vals, row_attrs=ds.ra, col_attrs=ca)
                         dsout = loompy.connect(out_file)
                 else:
                     dsout.add_columns(vals, ca)
