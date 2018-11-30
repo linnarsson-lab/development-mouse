@@ -100,3 +100,40 @@ class ExportL1(luigi.Task):
             patches, texts = plt.pie(counts)
             plt.legend(patches, labelnames, bbox_to_anchor=(0.1, 1), fontsize=15)
             plt.savefig(os.path.join(out_dir, "L1_" + self.tissue + "_quality_pie.png"))
+
+            # cytograph2 plots
+            try:
+                logging.info("Plotting latent factors")
+                cg.plot_factors(ds, base_name=os.path.join(out_dir, "L1_" + self.pool + "_factors"))
+            except:
+                pass
+
+            try:
+                logging.info("Plotting cell cycle")
+                cg.plot_cellcycle(ds, out_file=os.path.join(out_dir, "L1_" + self.pool + "_cellcycle.png"))
+            except:
+                pass
+
+            try:
+                logging.info("Plotting markers")
+                cg.plot_markers(ds, out_file=os.path.join(out_dir, "L1_" + self.pool + "_markers.png"))
+            except:
+                pass
+
+            try:
+                logging.info("Plotting neighborhood diagnostics")
+                cg.plot_radius_characteristics(ds, out_file=os.path.join(out_dir, "L1_" + self.pool + "_neighborhoods.png"))
+            except:
+                pass
+
+            try:
+                logging.info("Plotting batch covariates")
+                cg.plot_batch_covariates(ds, out_file=os.path.join(out_dir, "L1_" + self.pool + "_batches.png"))
+            except:
+                pass
+
+            try:
+                logging.info("Plotting UMI/gene counts")
+                cg.plot_umi_genes(ds, out_file=os.path.join(out_dir, "L1_" + self.pool + "_umi_genes.png"))
+            except:
+                pass

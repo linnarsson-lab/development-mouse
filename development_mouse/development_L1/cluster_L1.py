@@ -154,7 +154,12 @@ class ClusterL1(luigi.Task):
                 ds.set_attr("Clusters", labels + 1, axis=1)
                 ds.set_attr("Outliers", (labels == -1).astype('int'), axis=1)
                 logging.info(f"Found {labels.max() + 1} clusters")
-                dsout.close()
+                ds.close()
+            elif self.manifold_learning == 4:
+                logging.info("Running cytograph 2")
+                ds = loompy.connect(out_file)
+                cg.Cytograph2(k=25, k_pooling=10, n_factors=64, n_genes=2000).fit(ds)
+                ds.close()
             else:
                 dsout = loompy.connect(out_file)
                 ml = cg.ManifoldLearning(n_genes=self.n_genes, gtsne=self.gtsne, alpha=self.alpha, filter_cellcycle=self.filter_geneset, layer=self.layer)
