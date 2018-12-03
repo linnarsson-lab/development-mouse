@@ -56,7 +56,7 @@ class AggregateL1(luigi.Task):
 		logging = cg.logging(self)
 		with self.output().temporary_path() as out_file:
 			ds = loompy.connect(self.input().fn)
-			cg.Aggregator(self.n_markers).aggregate(ds, out_file)
+			cg.Aggregator().aggregate(ds, out_file) # cg.Aggregator(self.n_markers).aggregate(ds, out_file) causes error
 			dsagg = loompy.connect(out_file)
 
 			logging.info("Computing auto-annotation")
