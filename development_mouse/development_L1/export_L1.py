@@ -110,39 +110,36 @@ class ExportL1(luigi.Task):
             except:
                 pass
 
+            cg.plot_umi_genes(ds, out_file=os.path.join(out_dir, "L1_" + self.tissue + "_umi_genes.png"))
+
             # cytograph2 plots
+
             try:
-                logging.info("Plotting latent factors")
-                cg.plot_factors(ds, base_name=os.path.join(out_dir, "L1_" + self.pool + "_factors"))
+                logging.info("Plotting factors")
+                cg.plot_factors(ds, base_name=os.path.join(out_dir, "L1_" + self.tissue + "_factors"))
             except:
                 pass
-
+                
             try:
                 logging.info("Plotting cell cycle")
-                cg.plot_cellcycle(ds, out_file=os.path.join(out_dir, "L1_" + self.pool + "_cellcycle.png"))
+                cg.plot_cellcycle(ds, out_file=os.path.join(out_dir, "L1_" + self.tissue + "_cellcycle.png"))
             except:
                 pass
-
+            
             try:
                 logging.info("Plotting markers")
-                cg.plot_markers(ds, out_file=os.path.join(out_dir, "L1_" + self.pool + "_markers.png"))
+                cg.plot_markers(ds, out_file=os.path.join(out_dir, "L1_" + self.tissue + "_markers.png"))
             except:
                 pass
 
             try:
                 logging.info("Plotting neighborhood diagnostics")
-                cg.plot_radius_characteristics(ds, out_file=os.path.join(out_dir, "L1_" + self.pool + "_neighborhoods.png"))
+                cg.plot_radius_characteristics(ds, out_file=os.path.join(out_dir, "L1_" + self.tissue + "_neighborhoods.png"))
             except:
                 pass
-
+            
             try:
                 logging.info("Plotting batch covariates")
-                cg.plot_batch_covariates(ds, out_file=os.path.join(out_dir, "L1_" + self.pool + "_batches.png"))
-            except:
-                pass
-
-            try:
-                logging.info("Plotting UMI/gene counts")
-                cg.plot_umi_genes(ds, out_file=os.path.join(out_dir, "L1_" + self.pool + "_umi_genes.png"))
+                cg.plot_batch_covariates(ds, out_file=os.path.join(out_dir, "L1_" + self.tissue + "_batches.png"))
             except:
                 pass
