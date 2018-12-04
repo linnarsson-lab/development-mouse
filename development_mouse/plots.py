@@ -40,7 +40,7 @@ def plot_abs_graph(ds: loompy.LoomConnection, dsagg: loompy.LoomConnection, out_
 
     # Draw (faded) single cell nodes
     logging.info("Drawing nodes")
-    colors20 = np.vstack((plt.cm.Vega20b(np.linspace(0., 1, 20))[::2], plt.cm.Vega20c(np.linspace(0, 1, 20))[1::2]))
+    colors20 = np.vstack((plt.cm.tab20b(np.linspace(0., 1, 20))[::2], plt.cm.tab20c(np.linspace(0, 1, 20))[1::2]))
     plots = []
     names = []
     for i in range(max(labels) + 1):
@@ -163,7 +163,7 @@ def plot_velocity_summary(vlm: Any, confidence: np.ndarray, significant: np.ndar
 
     # Draw (faded) single cell nodes
     logging.info("Drawing nodes")
-    colors20 = np.vstack((plt.cm.Vega20b(np.linspace(0., 1, 20))[::2], plt.cm.Vega20c(np.linspace(0, 1, 20))[1::2]))
+    colors20 = np.vstack((plt.cm.tab20b(np.linspace(0., 1, 20))[::2], plt.cm.tab20c(np.linspace(0, 1, 20))[1::2]))
     plots = []
     names = []
     for i in range(max(labels) + 1):
@@ -257,7 +257,7 @@ def plot_punchcard_selection(ds: loompy.LoomConnection, out_file: str, filter_bo
 
     # Draw nodes
     logging.info("Drawing nodes")
-    colors20 = np.vstack((plt.cm.Vega20b(np.linspace(0., 1, 20))[::2], plt.cm.Vega20c(np.linspace(0, 1, 20))[1::2]))
+    colors20 = np.vstack((plt.cm.tab20b(np.linspace(0., 1, 20))[::2], plt.cm.tab20c(np.linspace(0, 1, 20))[1::2]))
     plots = []
     names = []
     for i in range(max(labels) + 1):

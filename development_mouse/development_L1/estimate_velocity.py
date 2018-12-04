@@ -49,7 +49,7 @@ class EstimateVelocity(luigi.Task):
 
             logging.info("Use `Cluster` column_attr to set clusters and _X, _Y to set the tsne embedding")
             vlm.set_clusters(cluster_labels=vlm.ca["Clusters"])
-            vlm.ts = np.column_stack([vlm.ca["_X"], vlm.ca["_Y"]])  # load the embedding from previous analysis
+            vlm.ts = np.column_stack([vlm.ca["TSNE"][:, 0], vlm.ca["TSNE"][:, 1]])  # load the embedding from previous analysis
 
             # NOTE: code below is basically identical to `default_filter_and_norm` but with the exception of adjust_totS_totU
             # Heuristics, we should set better heuristic and could add a config file with parameters for analysis

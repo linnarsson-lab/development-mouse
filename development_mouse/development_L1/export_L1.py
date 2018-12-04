@@ -64,7 +64,7 @@ class ExportL1(luigi.Task):
 
             dsagg.export(os.path.join(out_dir, f"L1_{self.tissue}_expression.tab"))
             dsagg.export(os.path.join(out_dir, f"L1_{self.tissue}_enrichment.tab"), layer="enrichment")
-            dsagg.export(os.path.join(out_dir, f"L1_{self.tissue}_enrichment_q.tab"), layer="enrichment_q")
+            # dsagg.export(os.path.join(out_dir, f"L1_{self.tissue}_enrichment_q.tab"), layer="enrichment_q")
             dsagg.export(os.path.join(out_dir, f"L1_{self.tissue}_trinaries.tab"), layer="trinaries")
             # NOTE: maybe we should have dsagg.export(*, layer="abstraction")
 
@@ -73,11 +73,18 @@ class ExportL1(luigi.Task):
             logging.info("Plotting manifold graph with auto-annotation")
             tags = list(dsagg.col_attrs["AutoAnnotation"])
             cg.plot_graph(ds, os.path.join(out_dir, f"L1_{self.tissue}_manifold.aa.png"), tags)
-            logging.info("Plotting manifold graph with auto-annotation, colored by age")
-            cg.plot_graph_age(ds, os.path.join(out_dir, f"L1_{self.tissue}_manifold.age.png"), tags)
 
-            logging.info("Plotting abstracted graph with auto-annotation")
-            dm.plot_abs_graph(ds, dsagg, os.path.join(out_dir, f"L1_{self.tissue}_absgraph.aa.png"), tags)
+            try:
+                logging.info("Plotting manifold graph with auto-annotation, colored by age")
+                cg.plot_graph_age(ds, os.path.join(out_dir, f"L1_{self.tissue}_manifold.age.png"), tags)
+            except:
+                pass
+
+            try:
+                logging.info("Plotting abstracted graph with auto-annotation")
+                dm.plot_abs_graph(ds, dsagg, os.path.join(out_dir, f"L1_{self.tissue}_absgraph.aa.png"), tags)
+            except:
+                pass
 
             logging.info("Plotting manifold graph with auto-auto-annotation")
             tags = list(dsagg.col_attrs["MarkerGenes"])
@@ -86,20 +93,22 @@ class ExportL1(luigi.Task):
             logging.info("Plotting marker heatmap")
             cg.plot_markerheatmap(ds, dsagg, n_markers_per_cluster=self.n_markers, out_file=os.path.join(out_dir, f"L1_{self.tissue}_heatmap.pdf"))
 
-            logging.info("Plotting quality class on t-SNE")
-            tags = list(dsagg.col_attrs["AutoAnnotation"])
-            cluster_mapping = {int(i.split(":")[0]): i.split(":")[1] for i in open(self.input()["NameQualityClusters"].fn).read().rstrip().split()}
-            dm.plot_quality_graph(ds, dsagg, out_file=os.path.join(out_dir, f"L1_{self.tissue}_quality_tsne.png"),
-                                  cluster_mapping=cluster_mapping, tags=tags)
-                    
-            logging.info("Plotting quality class in pie chart")
-            plt.figure(None, (10, 10))
-            labels = ds.col_attrs["QualityClass"].astype(int)
-            unique, counts = np.unique(labels, return_counts=True)
-            labelnames = [cluster_mapping[ix] for ix in unique]
-            patches, texts = plt.pie(counts)
-            plt.legend(patches, labelnames, bbox_to_anchor=(0.1, 1), fontsize=15)
-            plt.savefig(os.path.join(out_dir, "L1_" + self.tissue + "_quality_pie.png"))
+            try:
+                logging.info("Plotting quality class on t-SNE")
+                tags = list(dsagg.col_attrs["AutoAnnotation"])
+                cluster_mapping = {int(i.split(":")[0]): i.split(":")[1] for i in open(self.input()["NameQualityClusters"].fn).read().rstrip().split()}
+                dm.plot_quality_graph(ds, dsagg, out_file=os.path.join(out_dir, f"L1_{self.tissue}_quality_tsne.png"),
+                                    cluster_mapping=cluster_mapping, tags=tags)
+                logging.info("Plotting quality class in pie chart")
+                plt.figure(None, (10, 10))
+                labels = ds.col_attrs["QualityClass"].astype(int)
+                unique, counts = np.unique(labels, return_counts=True)
+                labelnames = [cluster_mapping[ix] for ix in unique]
+                patches, texts = plt.pie(counts)
+                plt.legend(patches, labelnames, bbox_to_anchor=(0.1, 1), fontsize=15)
+                plt.savefig(os.path.join(out_dir, "L1_" + self.tissue + "_quality_pie.png"))
+            except:
+                pass
 
             # cytograph2 plots
             try:
