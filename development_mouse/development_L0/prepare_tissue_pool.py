@@ -54,8 +54,8 @@ class PrepareTissuePool(luigi.Task):
 				logging.info("Marking invalid cells")
 				(mols, genes) = ds.map([np.sum, np.count_nonzero], axis=1)
 				valid_cells.append(np.logical_and(mols >= 600, (mols / genes) >= 1.2).astype('int'))
-				ds.set_attr("_Total", mols, axis=1)
-				ds.set_attr("_NGenes", genes, axis=1)
+				ds.ca.TotalRNA = mols
+				ds.ca.NGenes = genes
 				
 				logging.info(f"Computing mito and ribo for {sample}")
 				mito = np.where(npstr.startswith(ds.row_attrs["Gene"].astype("str"), "mt-"))[0]

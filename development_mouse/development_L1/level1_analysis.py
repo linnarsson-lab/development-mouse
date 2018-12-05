@@ -26,4 +26,4 @@ class Level1Analysis(luigi.WrapperTask):
 		tissues = cg.PoolSpec().tissues_for_project(self.project)
 		for tissue in tissues:
 			yield dm.ExportL1(tissue=tissue)
-			yield dm.VisualizeVelocity(tissue=tissue)
+			# yield dm.VisualizeVelocity(tissue=tissue)

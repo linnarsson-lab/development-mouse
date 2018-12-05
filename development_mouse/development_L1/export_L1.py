@@ -29,7 +29,7 @@ class ExportL1(luigi.Task):
             passing ``tissue``
         """
         return {f"AbstractL1(tissue={self.tissue})": dm.AbstractL1(tissue=self.tissue),
-                f"ClusterL1(tissue={self.tissue})": dm.ClusterL1(tissue=self.tissue),
+		f"ClusterL1(tissue={self.tissue})": dm.ClusterL1(tissue=self.tissue),
                 "NameQualityClusters": dm.NameQualityClusters()}
 
     def output(self) -> luigi.Target:
@@ -110,6 +110,8 @@ class ExportL1(luigi.Task):
             except:
                 pass
 
+            ds.ca.NGenes = ds.ca._NGenes
+            ds.ca.TotalRNA = ds.ca._Total
             cg.plot_umi_genes(ds, out_file=os.path.join(out_dir, "L1_" + self.tissue + "_umi_genes.png"))
 
             # cytograph2 plots
