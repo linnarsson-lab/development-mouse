@@ -235,7 +235,10 @@ def plot_velocity_summary(vlm: Any, confidence: np.ndarray, significant: np.ndar
 def plot_punchcard_selection(ds: loompy.LoomConnection, out_file: str, filter_bool: np.ndarray) -> None:
     n_cells = ds.shape[1]
     cells = np.where(ds.col_attrs["_Valid"] == 1)[0]
-    pos = np.vstack((ds.col_attrs["_X"], ds.col_attrs["_Y"])).transpose()
+    if "TSNE" in ds.ca:
+        pos = ds.ca.TSNE
+    else:
+        pos = np.vstack((ds.col_attrs["_X"], ds.col_attrs["_Y"])).transpose()
     labels = ds.col_attrs["Clusters"]
     if "Outliers" in ds.col_attrs:
         outliers = ds.col_attrs["Outliers"]

@@ -31,7 +31,7 @@ class AggregatePunchcard(luigi.Task):  # Status: Ok
 		logging = cg.logging(self)
 		with self.output().temporary_path() as out_file:
 			ds = loompy.connect(self.input().fn)
-			cg.Aggregator(self.n_markers).aggregate(ds, out_file)
+			cg.Aggregator().aggregate(ds, out_file) # cg.Aggregator(self.n_markers).aggregate(ds, out_file) caused error
 			dsagg = loompy.connect(out_file)
 
 			logging.info("Computing auto-annotation")

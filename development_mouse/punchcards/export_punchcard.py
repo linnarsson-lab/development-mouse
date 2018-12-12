@@ -34,7 +34,7 @@ class ExportPunchcard(luigi.Task):
             dsagg = loompy.connect(self.input()[1].fn)
             dsagg.export(os.path.join(out_dir, f"{self.card}_expression.tab"))
             dsagg.export(os.path.join(out_dir, f"{self.card}_enrichment.tab"), layer="enrichment")
-            dsagg.export(os.path.join(out_dir, f"{self.card}_enrichment_q.tab"), layer="enrichment_q")
+            # dsagg.export(os.path.join(out_dir, f"{self.card}_enrichment_q.tab"), layer="enrichment_q")
             dsagg.export(os.path.join(out_dir, f"{self.card}_trinaries.tab"), layer="trinaries")
 
             ds = loompy.connect(self.input()[0].fn)

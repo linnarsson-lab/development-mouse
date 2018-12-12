@@ -51,7 +51,8 @@ class ClusterPunchcard(luigi.Task):  # Status: OK
                 if dsout is None:
                     # NOTE Loompy Create should support multilayer !!!!
                     if type(vals) is dict:
-                        dsout = loompy.create(out_file, vals[""], row_attrs=ds.row_attrs, col_attrs=ca, dtype=vals[""].dtype)
+                        loompy.create(out_file, vals[""], row_attrs=ds.ra, col_attrs=ca)
+                        dsout = loompy.connect(out_file)
                         for layername, layervalues in vals.items():
                             if layername != "":
                                 dsout.set_layer(layername, layervalues, dtype=layervalues.dtype)

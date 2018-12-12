@@ -86,12 +86,13 @@ class PunchcardPool(luigi.Task):  # Status: check the filter manager
                     # Add data to the loom file
                     if dsout is None:
                         # create using main layer
-                        dsout = loompy.create(out_file, m[""], ds.row_attrs, ca)
+                        loompy.create(out_file, m[""], ds.ra, ca)
+                        dsout = loompy.connect(out_file)
                         # Add layers
                         for layer_name, chunk_of_matrix in m.items():
                             if layer_name == "":
                                 continue
-                            dsout.set_layer(layer_name, chunk_of_matrix, dtype=chunk_of_matrix.dtype)
+                            dsout[layer_name] = chunk_of_matrix
                     else:
                         dsout.add_columns(m, ca)
                 # NOTE Special attention not to merge clusters
