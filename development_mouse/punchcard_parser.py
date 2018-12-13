@@ -119,7 +119,14 @@ def parse_punchcard_require(punchcard_obj: Dict) -> List[luigi.Task]:
         requirement_type = requirement_entry["type"]
         requirement_kwargs = requirement_entry["kwargs"]
         Task = getattr(dm, requirement_type)
-        if issubclass(Task, luigi.WrapperTask):
+        if requirement_type == 'Level1Analysis':
+            try:
+                tissues = cg.PoolSpec().tissues_for_project(requirement_kwargs["project"])
+            except KeyError:
+                tissues = requirement_kwargs['tissue']
+            for tissue in tissues:
+                requirements.append([dm.ClusterL1(tissue=tissue), dm.ExportL1(tissue=tissue)])
+        elif issubclass(Task, luigi.WrapperTask):
             requirements.append(Task(**requirement_kwargs).requires())
         else:
             assert issubclass(Task, luigi.Task), f"{requirement_type} is not valid Task name"
