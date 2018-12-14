@@ -105,6 +105,11 @@ class ClusterPunchcard(luigi.Task):  # Status: OK
                 ds.set_attr("Outliers", (labels == -1).astype('int'), axis=1)
                 logging.info(f"Found {labels.max() + 1} clusters")
                 ds.close()
+            elif self.manifold_learning == 4:
+                logging.info("Running cytograph 2")
+                ds = loompy.connect(out_file)
+                dm.Cytograph2(k=25, k_pooling=10, n_factors=64, n_genes=2000).fit(ds)
+                ds.close()
             else:
                 ds = loompy.connect(out_file)
                 ml = cg.ManifoldLearning(n_genes=self.n_genes, gtsne=self.gtsne, alpha=self.alpha, filter_cellcycle=self.filter_geneset, layer=self.layer)

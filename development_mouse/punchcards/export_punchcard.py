@@ -39,16 +39,76 @@ class ExportPunchcard(luigi.Task):
 
             ds = loompy.connect(self.input()[0].fn)
 
-            logging.info(f"Plotting manifold graph with auto-annotation for {self.card}")
+            logging.info("Plotting manifold graph with auto-annotation")
             tags = list(dsagg.col_attrs["AutoAnnotation"])
-            cg.plot_graph(ds, os.path.join(out_dir, f"{self.card}_manifold.aa.png"), tags)
+            cg.plot_graph(ds, os.path.join(out_dir, f"L1_{self.card}_manifold.aa.png"), tags)
 
-            logging.info("Plotting manifold graph with auto-annotation, colored by age")
-            cg.plot_graph_age(ds, os.path.join(out_dir, f"{self.card}_manifold.age.png"), tags)
+            try:
+                logging.info("Plotting manifold graph with auto-annotation, colored by age")
+                cg.plot_graph_age(ds, os.path.join(out_dir, f"L1_{self.card}_manifold.age.png"), tags)
+            except:
+                pass
 
-            logging.info(f"Plotting manifold graph with auto-auto-annotation for {self.card}")
+            try:
+                logging.info("Plotting abstracted graph with auto-annotation")
+                dm.plot_abs_graph(ds, dsagg, os.path.join(out_dir, f"L1_{self.card}_absgraph.aa.png"), tags)
+            except:
+                pass
+
+            logging.info("Plotting manifold graph with auto-auto-annotation")
             tags = list(dsagg.col_attrs["MarkerGenes"])
-            cg.plot_graph(ds, os.path.join(out_dir, f"{self.card}_manifold.aaa.png"), tags)
+            cg.plot_graph(ds, os.path.join(out_dir, f"L1_{self.card}_manifold.aaa.png"), tags)
 
-            logging.info(f"Plotting marker heatmap for {self.card}")
-            cg.plot_markerheatmap(ds, dsagg, n_markers_per_cluster=self.n_markers, out_file=os.path.join(out_dir, f"{self.card}_heatmap.pdf"))
+            logging.info("Plotting marker heatmap")
+            cg.plot_markerheatmap(ds, dsagg, n_markers_per_cluster=self.n_markers, out_file=os.path.join(out_dir, f"L1_{self.card}_heatmap.pdf"))
+
+            try:
+                logging.info("Plotting quality class on t-SNE")
+                tags = list(dsagg.col_attrs["AutoAnnotation"])
+                cluster_mapping = {int(i.split(":")[0]): i.split(":")[1] for i in open(self.input()["NameQualityClusters"].fn).read().rstrip().split()}
+                dm.plot_quality_graph(ds, dsagg, out_file=os.path.join(out_dir, f"L1_{self.card}_quality_tsne.png"),
+                                    cluster_mapping=cluster_mapping, tags=tags)
+                logging.info("Plotting quality class in pie chart")
+                plt.figure(None, (10, 10))
+                labels = ds.col_attrs["QualityClass"].astype(int)
+                unique, counts = np.unique(labels, return_counts=True)
+                labelnames = [cluster_mapping[ix] for ix in unique]
+                patches, texts = plt.pie(counts)
+                plt.legend(patches, labelnames, bbox_to_anchor=(0.1, 1), fontsize=15)
+                plt.savefig(os.path.join(out_dir, "L1_" + self.card + "_quality_pie.png"))
+            except:
+                pass
+
+            cg.plot_umi_genes(ds, out_file=os.path.join(out_dir, "L1_" + self.card + "_umi_genes.png"))
+
+            # cytograph2 plots
+
+            try:
+                logging.info("Plotting factors")
+                cg.plot_factors(ds, base_name=os.path.join(out_dir, "L1_" + self.card + "_factors"))
+            except:
+                pass
+                
+            try:
+                logging.info("Plotting cell cycle")
+                cg.plot_cellcycle(ds, out_file=os.path.join(out_dir, "L1_" + self.card + "_cellcycle.png"))
+            except:
+                pass
+            
+            try:
+                logging.info("Plotting markers")
+                cg.plot_markers(ds, out_file=os.path.join(out_dir, "L1_" + self.card + "_markers.png"))
+            except:
+                pass
+
+            try:
+                logging.info("Plotting neighborhood diagnostics")
+                cg.plot_radius_characteristics(ds, out_file=os.path.join(out_dir, "L1_" + self.card + "_neighborhoods.png"))
+            except:
+                pass
+            
+            try:
+                logging.info("Plotting batch covariates")
+                cg.plot_batch_covariates(ds, out_file=os.path.join(out_dir, "L1_" + self.card + "_batches.png"))
+            except:
+                pass
