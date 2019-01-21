@@ -157,7 +157,7 @@ class ClusterL1(luigi.Task):
             elif self.manifold_learning == 4:
                 logging.info("Running cytograph 2")
                 ds = loompy.connect(out_file)
-                dm.Cytograph2(k=25, k_pooling=10, n_factors=64, n_genes=2000).fit(ds)
+                cg.Cytograph2(k=50, k_pooling=10, n_factors=64, n_genes=2000).fit(ds)
                 ds.close()
             else:
                 dsout = loompy.connect(out_file)
