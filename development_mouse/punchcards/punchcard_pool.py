@@ -52,8 +52,8 @@ class PunchcardPool(luigi.Task):  # Status: check the filter manager
                 clustered, export_folder = input_dict[0], input_dict[1]
                 autoannotated_fn = clustered.fn[:-5] + ".agg.loom"  # NOTE: this is some kind of workaround, points to the Aggragate task output
                 logging.debug(f"Adding cells from the source file {clustered.fn}")
-                ds = loompy.connect(clustered.fn)
-                dsagg = loompy.connect(autoannotated_fn)
+                ds = loompy.connect(clustered.fn, 'r')
+                dsagg = loompy.connect(autoannotated_fn, 'r')
                 
                 # Select the tags as specified in the process file
                 filter_bool = cg.FilterManager(analysis_obj, ds, dsagg).compute_filter()
