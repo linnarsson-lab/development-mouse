@@ -37,6 +37,13 @@ class ClusterL1(luigi.Task):
     filter_geneset = luigi.Parameter(default="None", description="(path) The path of a file containing as rows the gene symbol of genes to excluded (Note: despite the name it can be used for any gene set)")
     layer = luigi.Parameter(default="None", description="Layer used for manifold learning (i.e. the matrix used to compute PCA). Currently it only has effects when using `cytograph.ManifoldLearning` and not `cytograph.ManifoldLearning2`")
 
+    # cytograph2 parameters
+    n_genes = luigi.IntParameter(default=2000)
+    n_factors = luigi.IntParameter(default=64)
+    k_pooling = luigi.IntParameter(default=10)
+    k = luigi.IntParameter(default=50)
+    feature_selection_method = luigi.Parameter(default="variance")
+
     def requires(self) -> luigi.Task:
         return {"PrepareTissuePool": dm.PrepareTissuePool(tissue=self.tissue),
                 "NameQualityClusters": dm.NameQualityClusters(),
@@ -157,7 +164,9 @@ class ClusterL1(luigi.Task):
             elif self.manifold_learning == 4:
                 logging.info("Running cytograph 2")
                 ds = loompy.connect(out_file)
-                cg.Cytograph2(k=50, k_pooling=10, n_factors=64, n_genes=2000).fit(ds)
+                cg.Cytograph2(k=self.k, k_pooling=self.k_pooling, 
+                              n_factors=self.n_factors, n_genes=self.n_genes,
+                              feature_selection_method=self.feature_selection_method).fit(ds)
                 ds.close()
             else:
                 dsout = loompy.connect(out_file)
