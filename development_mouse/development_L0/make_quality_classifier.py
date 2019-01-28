@@ -24,7 +24,7 @@ class MakeQualityClassifier(luigi.Task):
     n_neighbors = luigi.IntParameter(default=100, description="The number of neighbours to use to classify the quality of a cell")
 
     def requires(self) -> Iterator[luigi.Task]:
-        tissues = cg.PoolSpec().tissues_for_project(self.project)
+        tissues = cg.PoolSpec(dm.paths().poolspec).tissues_for_project(self.project)
         for tissue in tissues:
             yield dm.PrepareTissuePool(tissue=tissue)
 
