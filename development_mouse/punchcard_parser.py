@@ -23,7 +23,7 @@ import copy
 
 
 class PunchcardParser(object):  # Status: needs to be run but looks ok
-    def __init__(self, root: str = "../punchcards") -> None:
+    def __init__(self, root: str = dm.paths().punchcards) -> None:
         # NOTE: root should be changed to a directory defined in a ~/.cytograph_rc file
         self.root = os.path.abspath(root)
         self._punchcard_dict = {}  # type: Dict

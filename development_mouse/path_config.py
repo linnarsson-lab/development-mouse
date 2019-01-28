@@ -10,3 +10,4 @@ class paths(luigi.Config):
     transcriptome = luigi.Parameter(default="/data/ref/cellranger/")
     not_use_velocyto = luigi.BoolParameter(default=False)
     autoannotation = luigi.Parameter(default="../auto-annotation/Mouse_development/")
+    punchcards = luigi.Parameter(default="../punchcards/")
