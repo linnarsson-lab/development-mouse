@@ -56,7 +56,7 @@ class PunchcardPool(luigi.Task):  # Status: check the filter manager
                 dsagg = loompy.connect(autoannotated_fn, 'r')
                 
                 # Select the tags as specified in the process file
-                filter_bool = cg.FilterManager(analysis_obj, ds, dsagg).compute_filter()
+                filter_bool = cg.FilterManager(analysis_obj, ds, dsagg, root=dm.paths().autoannotation).compute_filter()
                 logging.debug(f"Plot the cell selection.")
                 dm.plot_punchcard_selection(ds, os.path.join(export_folder.fn, f"Punchcard_{self.card}.png"), filter_bool)
 
