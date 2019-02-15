@@ -32,9 +32,11 @@ class ClusterPunchcard(luigi.Task):  # Status: OK
     # cytograph2 parameters
     n_genes = luigi.IntParameter(default=2000)
     n_factors = luigi.IntParameter(default=64)
+    use_poisson_pooling = luigi.BoolParameter(default=False)
     k_pooling = luigi.IntParameter(default=10)
-    k = luigi.IntParameter(default=50)
     feature_selection_method = luigi.Parameter(default="variance")
+    k = luigi.IntParameter(default=50)
+
 
     def requires(self) -> luigi.Task:
         return dm.PunchcardPool(card=self.card)
@@ -115,9 +117,16 @@ class ClusterPunchcard(luigi.Task):  # Status: OK
             elif self.manifold_learning == 4:
                 logging.info("Running cytograph 2")
                 ds = loompy.connect(out_file)
-                cg.Cytograph2(k=self.k, k_pooling=self.k_pooling, 
-                              n_factors=self.n_factors, n_genes=self.n_genes,
-                              feature_selection_method=self.feature_selection_method).fit(ds)
+                cytograph = cg.Cytograph2(n_genes=self.n_genes,
+                                          n_factors=self.n_factors, 
+                                          use_poisson_pooling=self.use_poisson_pooling, 
+                                          k_pooling=self.k_pooling, 
+                                          feature_selection_method=self.feature_selection_method,
+                                          k=self.k)
+                if self.use_poisson_pooling:
+                    cytograph.poisson_pooling(ds)
+                cytograph.fit(ds)
+                logging.info(f"Found {ds.ca.Clusters.max() + 1} clusters")
                 ds.close()
             else:
                 ds = loompy.connect(out_file)
