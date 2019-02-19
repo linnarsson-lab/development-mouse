@@ -57,6 +57,12 @@ class PrepareTissuePool(luigi.Task):
 				ds.ca.TotalRNA = mols
 				ds.ca.NGenes = genes
 				
+				logging.info(f"Calculating doublet scores for {sample}")
+				data = ds[:, :].T
+				doublet_scores, predicted_doublets = cg.Scrublet(data, expected_doublet_rate=0.05).scrub_doublets()
+				ds.ca.DoubletScore = doublet_scores
+				ds.ca.DoubletFlag = predicted_doublets.astype("int")
+
 				logging.info(f"Computing mito and ribo for {sample}")
 				mito = np.where(npstr.startswith(ds.row_attrs["Gene"].astype("str"), "mt-"))[0]
 				ribo = np.where(npstr.startswith(ds.row_attrs["Gene"].astype("str"), "Rpl"))[0]
@@ -111,13 +117,6 @@ class PrepareTissuePool(luigi.Task):
 			n_valid = np.sum(ds.col_attrs["_Valid"] == 1)
 			n_total = ds.shape[1]
 			logging.info("%d of %d cells were valid", n_valid, n_total)
-
-			# Calculate doublet scores
-			logging.info("Calculating doublet scores")
-			data = ds[:, :].T
-			doublet_scores, predicted_doublets = cg.Scrublet(data, expected_doublet_rate=0.05).scrub_doublets()
-			ds.ca.DoubletScore = doublet_scores
-			ds.ca.DoubletFlag = predicted_doublets.astype("int")
 			
 			classifier_path: str = os.path.join(dm.paths().samples, "classified", "classifier.pickle")
 			if os.path.exists(classifier_path) and not dm.skip().classifier:

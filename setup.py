@@ -16,7 +16,6 @@ setup(
 		'networkx',
 		'cytograph',
 		'luigi',
-		'polo',
 		'numpy-groupies',
 		'velocyto'
 	],
