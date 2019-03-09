@@ -35,6 +35,7 @@ class ClusterPunchcard(luigi.Task):  # Status: OK
     use_poisson_pooling = luigi.BoolParameter(default=False)
     k_pooling = luigi.IntParameter(default=10)
     feature_selection_method = luigi.Parameter(default="variance")
+    mask_cell_cycle = luigi.BoolParameter(default=False)
     k = luigi.IntParameter(default=50)
 
 
@@ -122,6 +123,7 @@ class ClusterPunchcard(luigi.Task):  # Status: OK
                                           use_poisson_pooling=self.use_poisson_pooling, 
                                           k_pooling=self.k_pooling, 
                                           feature_selection_method=self.feature_selection_method,
+                                          mask_cell_cycle=self.mask_cell_cycle,
                                           k=self.k)
                 if self.use_poisson_pooling:
                     cytograph.poisson_pooling(ds)

@@ -121,7 +121,7 @@ def parse_punchcard_require(punchcard_obj: Dict) -> List[luigi.Task]:
         Task = getattr(dm, requirement_type)
         if requirement_type == 'Level1Analysis':
             try:
-                tissues = cg.PoolSpec().tissues_for_project(requirement_kwargs["project"])
+                tissues = cg.PoolSpec(dm.paths().poolspec).tissues_for_project(requirement_kwargs["project"])
             except KeyError:
                 tissues = requirement_kwargs['tissue']
             for tissue in tissues:
