@@ -79,36 +79,26 @@ class ExportPunchcard(luigi.Task):
             except:
                 pass
 
-            cg.plot_umi_genes(ds, out_file=os.path.join(out_dir, "L1_" + self.card + "_umi_genes.png"))
-
             # cytograph2 plots
-
             try:
+                logging.info("Plotting UMAP")
+                cg.plot_graph(ds, os.path.join(out_dir, f"L1_{self.tissue}_UMAP_manifold.aaa.png"), tags, embedding="UMAP")
+                logging.info("Plotting UMI and gene counts")
+                cg.plot_umi_genes(ds, out_file=os.path.join(out_dir, "L1_" + self.tissue + "_umi_genes.png"))
                 logging.info("Plotting factors")
-                cg.plot_factors(ds, base_name=os.path.join(out_dir, "L1_" + self.card + "_factors"))
-            except:
-                pass
-                
-            try:
+                cg.plot_factors(ds, base_name=os.path.join(out_dir, "L1_" + self.tissue + "_factors"))
                 logging.info("Plotting cell cycle")
-                cg.plot_cellcycle(ds, out_file=os.path.join(out_dir, "L1_" + self.card + "_cellcycle.png"))
-            except:
-                pass
-            
-            try:
+                cg.plot_cellcycle(ds, out_file=os.path.join(out_dir, "L1_" + self.tissue + "_cellcycle.png"))
                 logging.info("Plotting markers")
-                cg.plot_markers(ds, out_file=os.path.join(out_dir, "L1_" + self.card + "_markers.png"))
-            except:
-                pass
-
-            try:
+                cg.plot_markers(ds, out_file=os.path.join(out_dir, "L1_" + self.tissue + "_markers.png"))
                 logging.info("Plotting neighborhood diagnostics")
-                cg.plot_radius_characteristics(ds, out_file=os.path.join(out_dir, "L1_" + self.card + "_neighborhoods.png"))
-            except:
-                pass
-            
-            try:
+                cg.plot_radius_characteristics(ds, out_file=os.path.join(out_dir, "L1_" + self.tissue + "_neighborhoods.png"))
                 logging.info("Plotting batch covariates")
-                cg.plot_batch_covariates(ds, out_file=os.path.join(out_dir, "L1_" + self.card + "_batches.png"))
+                cg.plot_batch_covariates(ds, out_file=os.path.join(out_dir, "L1_" + self.tissue + "_batches.png"))
+                cg.ClusterValidator().fit(ds, os.path.join(out_dir, f"L1_{self.tissue}_cluster_pp.png"))
+                logging.info("Plotting embedded velocity")
+                cg.plot_embedded_velocity(ds, out_file=os.path.join(out_dir, f"L1_{self.tissue}_velocity.png"))
+                logging.info("Plotting TFs")
+                cg.plot_TFs(ds, dsagg, out_file_root=os.path.join(out_dir, f"L1_{self.tissue}"))
             except:
                 pass
