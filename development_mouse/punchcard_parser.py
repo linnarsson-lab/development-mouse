@@ -33,7 +33,7 @@ class PunchcardParser(object):  # Status: needs to be run but looks ok
         self._has_printed: Set[str] = set()
 
     def _load_model(self) -> None:
-        self.model = yaml.load(open(os.path.join(self.root, "Model.yaml")))
+        self.model = yaml.load(open(os.path.join(self.root, "Model.yaml")), Loader=yaml.FullLoader)
 
     def _load_defs(self) -> None:
         debug_msgs = defaultdict(list)  # type: dict
@@ -43,7 +43,7 @@ class PunchcardParser(object):  # Status: needs to be run but looks ok
             for file in files:
                 if ((".yaml" == file[-5:]) or (".yml" == file[-4:])) and ("Model.yaml" not in file):
                     logging.debug(f"Reading {os.path.join(cur, file)}")
-                    temp_dict = yaml.load(open(os.path.join(cur, file)))
+                    temp_dict = yaml.load(open(os.path.join(cur, file)), Loader=yaml.FullLoader)
                     name = temp_dict["abbreviation"]
                     model_copy = copy.deepcopy(self.model)
 
@@ -91,7 +91,7 @@ class PunchcardParser(object):  # Status: needs to be run but looks ok
         graph = sparse.lil_matrix((n, n), dtype=bool)
         for i, key in enumerate(punchcard_names):
             # Only one parent is allowed, to avoid redundances
-            tasks = self._punchcard_dict[key]["require"]
+            tasks = self._punchcard_dict[key]["require"][0]
             if len(tasks) > 1 or tasks[0]["type"] != "Punchcard":
                 continue
             task = tasks[0]

@@ -61,10 +61,10 @@ class ExportL1(luigi.Task):
                 os.mkdir(out_dir)
             dsagg = loompy.connect(self.input()[f"AbstractL1(tissue={self.tissue})"].fn)
 
-            dsagg.export(os.path.join(out_dir, f"L1_{self.tissue}_expression.tab"))
-            dsagg.export(os.path.join(out_dir, f"L1_{self.tissue}_enrichment.tab"), layer="enrichment")
+            # dsagg.export(os.path.join(out_dir, f"L1_{self.tissue}_expression.tab"))
+            # dsagg.export(os.path.join(out_dir, f"L1_{self.tissue}_enrichment.tab"), layer="enrichment")
             # dsagg.export(os.path.join(out_dir, f"L1_{self.tissue}_enrichment_q.tab"), layer="enrichment_q")
-            dsagg.export(os.path.join(out_dir, f"L1_{self.tissue}_trinaries.tab"), layer="trinaries")
+            # dsagg.export(os.path.join(out_dir, f"L1_{self.tissue}_trinaries.tab"), layer="trinaries")
             # NOTE: maybe we should have dsagg.export(*, layer="abstraction")
 
             ds = loompy.connect(self.input()[f"ClusterL1(tissue={self.tissue})"].fn)

@@ -31,10 +31,10 @@ class ExportL2(luigi.Task):
             dsagg = loompy.connect(self.input().fn)
             dsagg.export(os.path.join(out_dir, "PoolL2_expression.tab"))
             dsagg.export(os.path.join(out_dir, "PoolL2_enrichment.tab"), layer="enrichment")
-            dsagg.export(os.path.join(out_dir, "PoolL2_enrichment_q.tab"), layer="enrichment_q")
+            #dsagg.export(os.path.join(out_dir, "PoolL2_enrichment_q.tab"), layer="enrichment_q")
             dsagg.export(os.path.join(out_dir, "PoolL2_trinaries.tab"), layer="trinaries")
 
-            dm.plot_dendrogram(dsag)
+            # dm.plot_dendrogram(dsagg)
             # ds = loompy.connect(self.requires().input().fn)
             # logging.info(f"Plotting marker heatmap for {self.card}")
             # cg.plot_markerheatmap(ds, dsagg, n_markers_per_cluster=self.n_markers, out_file=os.path.join(out_dir, f"{self.card}_heatmap.pdf"))

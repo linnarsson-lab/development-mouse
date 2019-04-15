@@ -26,7 +26,21 @@ class AggregateL2(luigi.Task):  # Status: Ok
         with self.output().temporary_path() as out_file:
             ds = loompy.connect(self.input().fn)
             logging.info("Aggregating L2 Pool")
-            cg.Aggregator(self.n_markers).aggregate(ds, out_file, batch_size=dm.memory().axis0)
+            agg_spec = {
+                        "Age": "tally",
+                        "Clusters": "first",
+                        "Class": "mode",
+                        "_Total": "mean",
+                        "Sex": "tally",
+                        "Tissue": "tally",
+                        "SampleID": "tally",
+                        "TissuePool": "first",
+                        "Outliers": "mean",
+                        "Clusters_original": "mode",
+                        "SourceFileName": "mode"
+			            }
+            cg.Aggregator().aggregate(ds, out_file, agg_spec=agg_spec)
+            # cg.Aggregator(self.n_markers).aggregate(ds, out_file, batch_size=dm.memory().axis0)
             dsagg = loompy.connect(out_file)
 
             logging.info("Computing auto-annotation of L2 Pool Aggregated")
