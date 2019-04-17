@@ -91,7 +91,7 @@ class PunchcardParser(object):  # Status: needs to be run but looks ok
         graph = sparse.lil_matrix((n, n), dtype=bool)
         for i, key in enumerate(punchcard_names):
             # Only one parent is allowed, to avoid redundances
-            tasks = self._punchcard_dict[key]["require"][0]
+            tasks = self._punchcard_dict[key]["require"]
             if len(tasks) > 1 or tasks[0]["type"] != "Punchcard":
                 continue
             task = tasks[0]

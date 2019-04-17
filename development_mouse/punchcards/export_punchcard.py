@@ -8,6 +8,7 @@ import networkx as nx
 import cytograph as cg
 import development_mouse as dm
 import luigi
+import numpy_groupies as npg
 
 
 class ExportPunchcard(luigi.Task):
@@ -95,7 +96,8 @@ class ExportPunchcard(luigi.Task):
                 cg.plot_radius_characteristics(ds, out_file=os.path.join(out_dir, self.card + "_neighborhoods.png"))
                 logging.info("Plotting batch covariates")
                 cg.plot_batch_covariates(ds, out_file=os.path.join(out_dir, self.card + "_batches.png"))
-                cg.ClusterValidator().fit(ds, os.path.join(out_dir, f"{self.card}_cluster_pp.png"))
+                proba = cg.ClusterValidator().fit(ds, os.path.join(out_dir, f"{self.card}_cluster_pp.png"))
+                dsagg.ca.ClusterValidation = npg.aggregate(ds.ca.Clusters, proba, axis=0, func="mean")
                 logging.info("Plotting embedded velocity")
                 cg.plot_embedded_velocity(ds, out_file=os.path.join(out_dir, f"{self.card}_velocity.png"))
                 logging.info("Plotting TFs")

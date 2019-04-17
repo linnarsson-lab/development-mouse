@@ -23,6 +23,13 @@ class PoolL2(luigi.Task):
     """Luigi Task to pool the leaves from punchcards tree
     """
     punchcard_deck = dm.PunchcardParser()
+    n_genes = luigi.IntParameter(default=2000)
+    n_factors = luigi.IntParameter(default=64)
+    use_poisson_pooling = luigi.BoolParameter(default=True)
+    k_pooling = luigi.IntParameter(default=10)
+    feature_selection_method = luigi.Parameter(default="variance")
+    mask_cell_cycle = luigi.BoolParameter(default=True)
+    k = luigi.IntParameter(default=50)
 
     def requires(self) -> List[luigi.Task]:
         leaves: List[str] = self.punchcard_deck.prune_leaves()
@@ -39,7 +46,7 @@ class PoolL2(luigi.Task):
             reference_accession = None
             for punchcard in self.input():
                 clusterP, exportP, *_ = punchcard  # It is confusing but it seems to not need .requires()
-                logging.debug(f"Connecting to {clusterP.fn} to merge it to PoolL2.loom")
+                logging.info(f"Connecting to {clusterP.fn} to merge it to PoolL2.loom")
                 ds = loompy.connect(clusterP.fn)
 
                 if reference_accession is None:
@@ -79,4 +86,18 @@ class PoolL2(luigi.Task):
                         dsout.add_columns(m, ca)
                 ds.close()
                 cluster_counter = np.max(dsout.col_attrs["Clusters"]) + 1
+
+            # Learn the manifold with cytograph but then reset the cluster names
+            #cytograph = cg.Cytograph2(n_genes=self.n_genes,
+            #                          n_factors=self.n_factors, 
+            #                          use_poisson_pooling=self.use_poisson_pooling, 
+            #                          k_pooling=self.k_pooling, 
+            #                          feature_selection_method=self.feature_selection_method,
+            #                          mask_cell_cycle=self.mask_cell_cycle,
+            #                          k=self.k)
+            #if self.use_poisson_pooling:
+            #    cytograph.poisson_pooling(dsout)
+            #cytograph.fit(dsout)
+            #dsout.ca.ClustersAfterPooling = dsout.ca.Clusters
+            #dsout.ca.Clusters == ca["Clusters"]
             dsout.close()
