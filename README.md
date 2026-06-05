@@ -6,9 +6,6 @@ Publication: [Braun et al: Comprehensive cell atlas of the first-trimester devel
 Download data:
   * Complete dataset, 31053 genes x 292495 cells, [anndata](https://anndata.scverse.org/en/stable/) format: [developing_mouse_nervous_system.h5ad](https://www.dropbox.com/scl/fi/taxtkhr3fezv6qoe86vcb/developing_mouse_nervous_system.h5ad?rlkey=fnphj9kokc2mstzudx3cmze6n&st=u7sawgjl&dl=0)
   * One column per cluster, 31053 genes x 798 clusters, [loom](https://loompy.org) format: [dev_all.agg.loom](https://www.dropbox.com/scl/fi/67mu8p6sxqymui39ltz54/dev_all.agg.loom?rlkey=64invw7it2hqe578k1jidpztt&st=rp3jocip&dl=0)
-  * Spatial transcriptomics at 5w: [640um](https://www.dropbox.com/scl/fi/4igq3gd8g6qj5nqo2rvdh/LBEXP20211117_EEL_HE_5w_640um_RNA_transformed_assigned.parquet?rlkey=y0vrnb9c05w9wjjpcq52ophjo&st=sblutml4&dl=0)
- [810um](https://www.dropbox.com/scl/fi/obtfabltd9b4fd1r27tbi/LBEXP20211119_EEL_HE_5w_810um_RNA_transformed_assigned.parquet?rlkey=ot9y67j85wpw0988eueh35uy0&st=r5h9r66a&dl=0)
- [970um](https://www.dropbox.com/scl/fi/66kucqzt1x4mwp65q1l85/LBEXP20211113_EEL_HE_5w_970um_RNA_transformed_assigned.parquet?rlkey=ltlss5qz1ef188dvahnn8qvf0&st=a49q7nlp&dl=0)
 
 ## Installation
 
