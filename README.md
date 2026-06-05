@@ -3,9 +3,9 @@ Analysis pipeline for the mouse developing nervous system project.
 
 Publication: [Braun et al: Comprehensive cell atlas of the first-trimester developing human brain](https://www.science.org/doi/10.1126/science.adf1226)
 
-Download data in [loom format](https://loompy.org):
-  * Complete dataset (31053 genes x 292495 cells): [https://storage.googleapis.com/linnarsson-lab-loom/dev_all.loom](https://storage.googleapis.com/linnarsson-lab-loom/dev_all.loom)
-  * One column per cluster (31053 genes x 798 clusters): [https://storage.googleapis.com/linnarsson-lab-loom/dev_all.agg.loom](https://storage.googleapis.com/linnarsson-lab-loom/dev_all.agg.loom)
+Download data:
+  * Complete dataset, 31053 genes x 292495 cells, [anndata](https://anndata.scverse.org/en/stable/) format: [developing_mouse_nervous_system.h5ad](https://www.dropbox.com/scl/fi/taxtkhr3fezv6qoe86vcb/developing_mouse_nervous_system.h5ad?rlkey=fnphj9kokc2mstzudx3cmze6n&st=u7sawgjl&dl=0)
+  * One column per cluster, 31053 genes x 798 clusters, [loom format](https://loompy.org): [dev_all.agg.loom](https://www.dropbox.com/scl/fi/67mu8p6sxqymui39ltz54/dev_all.agg.loom?rlkey=64invw7it2hqe578k1jidpztt&st=rp3jocip&dl=0)
 
 ## Installation
 
